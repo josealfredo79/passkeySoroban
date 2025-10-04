@@ -35,7 +35,18 @@ interface BrowserSupport {
   error?: string;
 }
 
-const AdvancedPasskeyDemo = () => {
+interface AdvancedPasskeyDemoProps {
+  onSuccess?: (data: {
+    credentialId: string;
+    publicKey: string;
+    accountAddress?: string;
+    deviceInfo?: string;
+    username?: string;
+  }) => void;
+  onBack?: () => void;
+}
+
+const AdvancedPasskeyDemo: React.FC<AdvancedPasskeyDemoProps> = ({ onSuccess, onBack }) => {
   // Estados principales
   const [passkeyState, setPasskeyState] = useState<PasskeyState>({
     username: '',
@@ -187,10 +198,20 @@ const AdvancedPasskeyDemo = () => {
 
       setSuccess('🎉 ¡Cuenta creada exitosamente! Redirigiendo al dashboard...');
       
-      // Ir al dashboard después de un pequeño delay
-      setTimeout(() => {
-        setCurrentStep('dashboard');
-      }, 1500);
+      // Llamar a onSuccess si está disponible
+      if (onSuccess) {
+        onSuccess({
+          credentialId: newPasskeyState.credentialId!,
+          publicKey: newPasskeyState.publicKey!,
+          accountAddress: newPasskeyState.accountAddress || undefined,
+          username: newPasskeyState.username
+        });
+      } else {
+        // Ir al dashboard después de un pequeño delay si no hay callback
+        setTimeout(() => {
+          setCurrentStep('dashboard');
+        }, 1500);
+      }
       
     } catch (error) {
       console.error('Error en registro:', error);
@@ -330,13 +351,27 @@ const AdvancedPasskeyDemo = () => {
         />
       </div>
 
-      <button
-        onClick={() => setCurrentStep('register')}
-        disabled={loading || !passkeyState.username.trim() || !browserSupport?.supported}
-        className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-      >
-        Continuar al Registro
-      </button>
+      <div className="flex space-x-3">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="flex-1 bg-gray-500 text-white py-3 px-4 rounded-md hover:bg-gray-600 transition-colors flex items-center justify-center space-x-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Volver</span>
+          </button>
+        )}
+        
+        <button
+          onClick={() => setCurrentStep('register')}
+          disabled={loading || !passkeyState.username.trim() || !browserSupport?.supported}
+          className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        >
+          Continuar al Registro
+        </button>
+      </div>
     </div>
   );
 
