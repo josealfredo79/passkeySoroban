@@ -301,10 +301,10 @@ const AdvancedPasskeyDemo: React.FC<AdvancedPasskeyDemoProps> = ({ onSuccess, on
     if (!browserSupport) return null;
 
     return (
-      <div className={`mb-4 p-3 rounded-md text-sm ${
+      <div className={`mb-4 p-3 rounded-md text-sm backdrop-blur-sm border ${
         browserSupport.supported 
-          ? 'bg-green-50 text-green-700 border border-green-200'
-          : 'bg-red-50 text-red-700 border border-red-200'
+          ? 'bg-green-500/20 text-green-300 border-green-500/30'
+          : 'bg-red-500/20 text-red-300 border-red-500/30'
       }`}>
         {browserSupport.supported ? (
           <div>
@@ -326,10 +326,10 @@ const AdvancedPasskeyDemo: React.FC<AdvancedPasskeyDemoProps> = ({ onSuccess, on
   const renderSetupStep = () => (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+        <h2 className="text-2xl font-bold mb-4 text-center text-white">
           🚀 Soroban Passkey Demo Avanzado
         </h2>
-        <p className="text-gray-600 text-center mb-6">
+        <p className="text-gray-300 text-center mb-6">
           Cuenta blockchain sin contraseñas usando WebAuthn y Soroban
         </p>
       </div>
@@ -337,7 +337,7 @@ const AdvancedPasskeyDemo: React.FC<AdvancedPasskeyDemoProps> = ({ onSuccess, on
       {renderBrowserSupport()}
 
       <div>
-        <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
           Nombre de usuario
         </label>
         <input
@@ -379,17 +379,17 @@ const AdvancedPasskeyDemo: React.FC<AdvancedPasskeyDemoProps> = ({ onSuccess, on
   const renderRegisterStep = () => (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+        <h2 className="text-2xl font-bold mb-4 text-center text-white">
           🔐 Crear Passkey
         </h2>
-        <p className="text-gray-600 text-center mb-6">
+        <p className="text-gray-300 text-center mb-6">
           Usuario: <strong>{passkeyState.username}</strong>
         </p>
       </div>
 
-      <div className="bg-blue-50 p-4 rounded-md">
-        <h3 className="font-semibold text-blue-900 mb-2">¿Qué va a pasar?</h3>
-        <ul className="text-blue-800 text-sm space-y-1">
+      <div className="bg-blue-500/20 p-4 rounded-md border border-blue-500/30 backdrop-blur-sm">
+        <h3 className="font-semibold text-blue-300 mb-2">¿Qué va a pasar?</h3>
+        <ul className="text-blue-200 text-sm space-y-1">
           <li>• Se creará un passkey en tu dispositivo</li>
           <li>• Se desplegará una cuenta en Stellar</li>
           <li>• Podrás usar biometría para autenticar</li>
@@ -418,17 +418,17 @@ const AdvancedPasskeyDemo: React.FC<AdvancedPasskeyDemoProps> = ({ onSuccess, on
   const renderDashboard = () => (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+        <h2 className="text-2xl font-bold mb-4 text-center text-white">
           🎛️ Dashboard
         </h2>
-        <p className="text-gray-600 text-center mb-6">
+        <p className="text-gray-300 text-center mb-6">
           Usuario: <strong>{passkeyState.username}</strong>
         </p>
       </div>
 
-      <div className="bg-green-50 p-4 rounded-md">
-        <h3 className="font-semibold text-green-900 mb-2">✅ Cuenta Activa</h3>
-        <div className="text-green-800 text-sm space-y-2">
+      <div className="bg-green-500/20 p-4 rounded-md border border-green-500/30 backdrop-blur-sm">
+        <h3 className="font-semibold text-green-300 mb-2">✅ Cuenta Activa</h3>
+        <div className="text-green-200 text-sm space-y-2">
           <div>
             <strong>Dirección:</strong> 
             <div className="font-mono text-xs break-all">
@@ -467,19 +467,19 @@ const AdvancedPasskeyDemo: React.FC<AdvancedPasskeyDemoProps> = ({ onSuccess, on
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-xl p-6">
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+      <div className="relative z-10 w-full max-w-md">
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20">
           {/* Mensajes de estado */}
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-red-700 text-sm">{error}</p>
+            <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-md backdrop-blur-sm">
+              <p className="text-red-300 text-sm">{error}</p>
             </div>
           )}
 
           {success && (
-            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
-              <p className="text-green-700 text-sm">{success}</p>
+            <div className="mb-4 p-3 bg-green-500/20 border border-green-500/30 rounded-md backdrop-blur-sm">
+              <p className="text-green-300 text-sm">{success}</p>
             </div>
           )}
 
@@ -495,6 +495,13 @@ const AdvancedPasskeyDemo: React.FC<AdvancedPasskeyDemoProps> = ({ onSuccess, on
           <p>Powered by Soroban + WebAuthn</p>
           <p>Implementación basada en kalepail/soroban-passkey</p>
         </div>
+      </div>
+
+      {/* Background Decorations */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-500"></div>
       </div>
     </div>
   );
