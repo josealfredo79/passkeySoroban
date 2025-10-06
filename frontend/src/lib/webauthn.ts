@@ -82,13 +82,13 @@ export async function startRegistration(
     // Create credential options
     const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions =
       {
-        challenge,
+        challenge: challenge as BufferSource,
         rp: {
           name: "Soroban Passkey Demo",
           id: typeof window !== "undefined" ? window.location.hostname : "localhost",
         },
         user: {
-          id: userId,
+          id: userId as BufferSource,
           name: username,
           displayName: username,
         },
@@ -195,7 +195,7 @@ export async function startAuthentication(): Promise<PasskeyResult> {
     // Create assertion options
     const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions =
       {
-        challenge,
+        challenge: challenge as BufferSource,
         allowCredentials,
         timeout: 60000,
         userVerification: "required",

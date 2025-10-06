@@ -16,12 +16,13 @@ interface IncomeChartProps {
 export default function IncomeChart({ incomeHistory }: IncomeChartProps) {
   // Group records by week and calculate totals
   const weeklyData = incomeHistory.records.reduce((acc, record) => {
-    const existing = acc.find(item => item.week === record.week);
+    const weekLabel = `Semana ${record.week}`;
+    const existing = acc.find(item => item.week === weekLabel);
     if (existing) {
       existing.amount += record.amount;
     } else {
       acc.push({
-        week: `Semana ${record.week}`,
+        week: weekLabel,
         amount: record.amount,
       });
     }
