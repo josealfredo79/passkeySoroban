@@ -57,6 +57,10 @@ export async function deployPasskeyContract(
 
   // Get the wasm hash from the result
   const wasmHash = uploadResponse.returnValue;
+  
+  if (!wasmHash) {
+    throw new Error("Failed to get wasm hash from upload response");
+  }
 
   // Deploy the contract
   const deployTx = new StellarSdk.TransactionBuilder(account, {
@@ -65,7 +69,7 @@ export async function deployPasskeyContract(
   })
     .addOperation(
       StellarSdk.Operation.createCustomContract({
-        wasmHash,
+        wasmHash: wasmHash as any,
         address: new StellarSdk.Address(sourceKeypair.publicKey()),
       })
     )
@@ -163,10 +167,10 @@ export async function getOwnerPublicKey(
         .build()
     );
 
-    if (result.result) {
+    if ('result' in result && result.result) {
       // Extract the public key bytes from the result
       const publicKeyBytes = result.result;
-      return new Uint8Array(Buffer.from(publicKeyBytes));
+      return new Uint8Array(Buffer.from(publicKeyBytes as any));
     }
 
     return null;

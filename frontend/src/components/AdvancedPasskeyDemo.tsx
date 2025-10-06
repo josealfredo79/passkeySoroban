@@ -31,8 +31,13 @@ interface PasskeyState {
 
 interface BrowserSupport {
   supported: boolean;
-  platformAuthenticator: boolean;
+  platformAuthenticator?: boolean;
   error?: string;
+  details?: {
+    webauthn: boolean;
+    windowsHello: boolean;
+    userAgent: string;
+  };
 }
 
 interface AdvancedPasskeyDemoProps {

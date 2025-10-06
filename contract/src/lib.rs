@@ -176,5 +176,11 @@ impl CustomAccountInterface for PasskeyAccount {
     }
 }
 
+// Loan contract modules
+pub mod loan_types;
+pub mod loan_contract;
+
 #[cfg(test)]
 mod test;
+#[cfg(test)]
+mod loan_test;
