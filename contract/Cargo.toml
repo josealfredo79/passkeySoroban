@@ -13,6 +13,10 @@ serde = { version = "1.0", default-features = false, features = ["derive"] }
 [dev-dependencies]
 soroban-sdk = { version = "21.7.3", features = ["testutils"] }
 
+[features]
+default = []
+loan = []  # Feature flag for the loan contract
+
 [profile.release]
 opt-level = "z"
 overflow-checks = true

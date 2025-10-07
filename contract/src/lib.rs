@@ -178,3 +178,15 @@ impl CustomAccountInterface for PasskeyAccount {
 
 #[cfg(test)]
 mod test;
+
+// ====== EBAS Credit Scoring Loan Contract ======
+// This is compiled as a separate contract using feature flags
+
+#[cfg(feature = "loan")]
+pub mod loan_types;
+
+#[cfg(feature = "loan")]
+pub mod loan_contract;
+
+#[cfg(feature = "loan")]
+pub use loan_contract::*;
