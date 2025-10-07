@@ -32,15 +32,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
         <div className="mx-auto max-w-4xl text-center">
           {/* Main Headline */}
           <div className="mb-8">
+            <div className="text-6xl mb-4">💰</div>
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-              El Futuro de la
+              Préstamos Instantáneos
               <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Autenticación Web3
+                Sin Papeleos
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Autentícate sin contraseñas usando biometría y crea cuentas blockchain 
-              de forma segura con tecnología WebAuthn y Soroban.
+              Conecta tus apps de ingresos (Uber, Rappi, DiDi) y obtén un préstamo 
+              al instante basado en tu historial real. Powered by Stellar Blockchain.
             </p>
           </div>
 
@@ -48,7 +49,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
           <div className="mb-16">
             <button
               onClick={onStartSession}
-              className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-lg font-semibold rounded-xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 hover:-translate-y-1"
+              className="group relative px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-lg font-semibold rounded-xl shadow-2xl hover:shadow-green-500/25 transition-all duration-300 hover:scale-105 hover:-translate-y-1"
             >
               <span className="relative z-10 flex items-center space-x-2">
                 <span>Comenzar Ahora</span>
