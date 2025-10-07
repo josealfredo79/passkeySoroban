@@ -49,17 +49,36 @@ Implementar un sistema completo de préstamos instantáneos basado en credit sco
 
 ---
 
-## ✅ COMPLETADO (DÍA 1 - PARCIAL)
+## ✅ COMPLETADO (DÍA 1) ✅
 
 ### Task 1.2: Setup de Token de Prueba ✅
 - [x] Wallet pool-admin creado: `GDQ3STE6FVPXQ2TWOMMHWFYMH4IM5WZLQ6PPSV57HSDVP5PVKFICIIPB`
 - [x] Wallet pool-funds creado: `GAUXX5GYB7ZCUWTKXJJKYJ4F45XMTPDK6IEHH4KBN4EMHBFW4HERTNTI`
 - [x] Ambos wallets fondeados con 10,000 XLM cada uno
 - [x] Token contract USDC desplegado: `CA7N7ME5RCXHM3YOCM3YTM5FTKRIPVAJAEZWKLUJNINDQZQV73GNCHAA`
-- [x] `.env.local` configurado con todas las variables
+- [x] `.env.local` y `.env.example` configurados con todas las variables
 - [x] Mock mode habilitado para MVP (simular 10,000 USDC de balance)
 
 **Decisión de Diseño:** Para el MVP, usaremos mock data en el backend en lugar de mint real de tokens. Esto simplifica el setup y es perfectamente válido para demostrar el flujo completo.
+
+### Task 1.3: Diseñar Smart Contract de Préstamos ✅
+- [x] Archivos creados:
+  - `contract/src/loan_types.rs` - Tipos de datos (LoanRecord, TransferResult, LoanConfig, LoanError)
+  - `contract/src/loan_contract.rs` - Estructura del contrato con 6 funciones públicas
+  - `contract/src/loan_test.rs` - Suite con 7 tests preparados
+- [x] Estructuras de datos definidas con `#[contracttype]` y `#[contracterror]`
+- [x] Funciones públicas:
+  - `initialize()` - Configurar contrato con admin, token y pool
+  - `transfer_loan()` - Desembolsar préstamo según credit score
+  - `get_loan_history()` - Historial de préstamos del usuario
+  - `deposit_to_pool()` - Depositar fondos al pool
+  - `get_pool_balance()` - Consultar balance del pool
+  - `check_eligibility()` - Verificar elegibilidad para préstamo
+- [x] Funciones helper definidas (require_initialized, require_admin, has_active_loan, record_loan)
+- [x] Feature flag `loan` configurado en `Cargo.toml`
+- [x] **Compilación exitosa**: `cargo check --features loan` ✅ (0 errors)
+
+**Nota:** Las funciones usan `todo!()` por ahora. La implementación completa se hará en DÍA 2.
 
 ---
 
@@ -122,8 +141,8 @@ Implementar un sistema completo de préstamos instantáneos basado en credit sco
 
 ### Por Día
 - **DÍA 0:** ✅ 100% (Setup y Planificación)
-- **DÍA 1:** 🔄 33% (Task 1.2 completado, Task 1.3 pendiente)
-- **DÍA 2:** ⏳ 0% (No iniciado)
+- **DÍA 1:** ✅ 100% (Token setup + Smart contract diseñado)
+- **DÍA 2:** ⏳ 0% (Próximo: Implementar lógica del contrato)
 - **DÍA 3:** ⏳ 0% (No iniciado)
 - **DÍA 4:** ⏳ 0% (No iniciado)
 - **DÍA 5:** ⏳ 0% (No iniciado)
@@ -131,13 +150,13 @@ Implementar un sistema completo de préstamos instantáneos basado en credit sco
 - **DÍA 7:** ⏳ 0% (No iniciado)
 
 ### Por Componente
-- **Smart Contract:** 5% (Token setup completado)
+- **Smart Contract:** 20% (Estructura completa, pendiente implementación)
 - **Backend API:** 0%
 - **Frontend:** 10% (base existente)
-- **Testing:** 0%
-- **Documentation:** 20%
+- **Testing:** 10% (Tests estructurados, pendiente implementación)
+- **Documentation:** 25%
 
-### Total: **7%** (DÍA 1 en progreso)
+### Total: **12%** (DÍA 1 completado! 🎉)
 
 ---
 
