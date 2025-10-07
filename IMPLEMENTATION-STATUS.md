@@ -49,6 +49,20 @@ Implementar un sistema completo de préstamos instantáneos basado en credit sco
 
 ---
 
+## ✅ COMPLETADO (DÍA 1 - PARCIAL)
+
+### Task 1.2: Setup de Token de Prueba ✅
+- [x] Wallet pool-admin creado: `GDQ3STE6FVPXQ2TWOMMHWFYMH4IM5WZLQ6PPSV57HSDVP5PVKFICIIPB`
+- [x] Wallet pool-funds creado: `GAUXX5GYB7ZCUWTKXJJKYJ4F45XMTPDK6IEHH4KBN4EMHBFW4HERTNTI`
+- [x] Ambos wallets fondeados con 10,000 XLM cada uno
+- [x] Token contract USDC desplegado: `CA7N7ME5RCXHM3YOCM3YTM5FTKRIPVAJAEZWKLUJNINDQZQV73GNCHAA`
+- [x] `.env.local` configurado con todas las variables
+- [x] Mock mode habilitado para MVP (simular 10,000 USDC de balance)
+
+**Decisión de Diseño:** Para el MVP, usaremos mock data en el backend en lugar de mint real de tokens. Esto simplifica el setup y es perfectamente válido para demostrar el flujo completo.
+
+---
+
 ## 🚧 EN PROGRESO
 
 **Ninguna tarea en progreso actualmente.**
@@ -57,13 +71,7 @@ Implementar un sistema completo de préstamos instantáneos basado en credit sco
 
 ## 📋 PENDIENTE
 
-### DÍA 1: Setup y Diseño
-- [ ] Task 1.2: Setup de Token de Prueba (2 horas)
-  - [ ] Crear wallet pool-admin
-  - [ ] Deploy token contract USDC
-  - [ ] Mint 10,000 USDC
-  - [ ] Guardar contract ID en .env
-  
+### DÍA 1: Setup y Diseño (CONTINUACIÓN)
 - [ ] Task 1.3: Diseñar Smart Contract de Préstamos (4 horas)
   - [ ] Crear archivos: loan_contract.rs, loan_types.rs, loan_test.rs
   - [ ] Definir estructura LoanContract
@@ -114,7 +122,7 @@ Implementar un sistema completo de préstamos instantáneos basado en credit sco
 
 ### Por Día
 - **DÍA 0:** ✅ 100% (Setup y Planificación)
-- **DÍA 1:** ⏳ 0% (No iniciado)
+- **DÍA 1:** 🔄 33% (Task 1.2 completado, Task 1.3 pendiente)
 - **DÍA 2:** ⏳ 0% (No iniciado)
 - **DÍA 3:** ⏳ 0% (No iniciado)
 - **DÍA 4:** ⏳ 0% (No iniciado)
@@ -123,13 +131,13 @@ Implementar un sistema completo de préstamos instantáneos basado en credit sco
 - **DÍA 7:** ⏳ 0% (No iniciado)
 
 ### Por Componente
-- **Smart Contract:** 0%
+- **Smart Contract:** 5% (Token setup completado)
 - **Backend API:** 0%
 - **Frontend:** 10% (base existente)
 - **Testing:** 0%
-- **Documentation:** 15%
+- **Documentation:** 20%
 
-### Total: **3%** (preparación completada)
+### Total: **7%** (DÍA 1 en progreso)
 
 ---
 
@@ -137,9 +145,17 @@ Implementar un sistema completo de préstamos instantáneos basado en credit sco
 
 ### Variables de Entorno (`.env.local`)
 ```bash
-# Pendiente de configurar
-NEXT_PUBLIC_RPC_URL=
-NEXT_PUBLIC_TOKEN_CONTRACT_ID=
+# ✅ CONFIGURADO
+NEXT_PUBLIC_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+NEXT_PUBLIC_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
+NEXT_PUBLIC_TOKEN_CONTRACT_ID=CA7N7ME5RCXHM3YOCM3YTM5FTKRIPVAJAEZWKLUJNINDQZQV73GNCHAA
+NEXT_PUBLIC_POOL_ADMIN_ADDRESS=GDQ3STE6FVPXQ2TWOMMHWFYMH4IM5WZLQ6PPSV57HSDVP5PVKFICIIPB
+NEXT_PUBLIC_POOL_FUNDS_ADDRESS=GAUXX5GYB7ZCUWTKXJJKYJ4F45XMTPDK6IEHH4KBN4EMHBFW4HERTNTI
+NEXT_PUBLIC_MOCK_POOL_BALANCE=10000
+NEXT_PUBLIC_MOCK_MODE=true
+
+# ⏳ PENDIENTE
+NEXT_PUBLIC_LOAN_CONTRACT_ID=
 NEXT_PUBLIC_LOAN_CONTRACT_ID=
 NEXT_PUBLIC_POOL_ADDRESS=
 ```
