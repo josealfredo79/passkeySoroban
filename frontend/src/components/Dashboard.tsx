@@ -265,6 +265,18 @@ const Dashboard: React.FC<DashboardProps> = ({ passkeyData, onLogout, onAuthenti
                       </div>
                     </div>
                   </div>
+
+                  {/* EBAS Button */}
+                  <a 
+                    href="/ebas-dashboard"
+                    className="block bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-lg p-6 text-center transform transition-all hover:scale-105 shadow-lg"
+                  >
+                    <div className="text-2xl mb-2">💰</div>
+                    <h4 className="text-white font-bold text-lg mb-1">Sistema de Préstamos EBAS</h4>
+                    <p className="text-purple-100 text-sm">
+                      Obtén préstamos instantáneos conectando tus apps de ingresos
+                    </p>
+                  </a>
                 </div>
               </div>
             </div>
