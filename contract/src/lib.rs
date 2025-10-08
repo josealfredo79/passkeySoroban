@@ -176,7 +176,8 @@ impl CustomAccountInterface for PasskeyAccount {
     }
 }
 
-#[cfg(test)]
+// Disable original passkey tests when running loan tests
+#[cfg(all(test, not(feature = "loan")))]
 mod test;
 
 // ====== EBAS Credit Scoring Loan Contract ======
