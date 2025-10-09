@@ -2,14 +2,49 @@
 
 Implementación completa de autenticación con Passkeys (WebAuthn) para contratos inteligentes de Soroban en la blockchain de Stellar.
 
-## 🎯 Características
+## 🎯 Estado Actual (Fase MVP)
 
-- ✅ **Contrato de cuenta personalizado** en Soroban con verificación secp256r1
-- ✅ **Frontend moderno** con Next.js 14+ y TypeScript
-- ✅ **Autenticación biométrica** con WebAuthn/Passkeys
-- ✅ **Sin contraseñas** - usa Face ID, Touch ID o Windows Hello
-- ✅ **Integración completa** con Stellar SDK
-- ✅ **UI/UX moderna** con Tailwind CSS
+**Funcionalidades Operativas:**
+- ✅ Transacciones reales en blockchain Stellar testnet
+- ✅ Cálculo de scoring crediticio
+- ✅ API de préstamos (`/api/request-loan-real`)
+- ✅ Flujo de verificación de ingresos
+- ✅ Notificaciones de éxito con hash de transacción
+
+**Correcciones Recientes:**
+- ✅ Node.js actualizado a v20.19.5 (desde v10.19.0)
+- ✅ Montos de transferencia XLM optimizados (rango 50-500 XLM)
+- ✅ Dirección Stellar mock inválida reemplazada con dirección válida de testnet
+- ✅ Mensajes de error de Horizon API mejorados (amigables al usuario)
+- ✅ Caché de Next.js limpiada y servidor reiniciado
+
+**Últimas Transacciones Exitosas:**
+- Hash 1: `c53551b31642959779f6db9d1e4ff90bf3f31c70a09e0476eb90037e97d20fbb`
+- Hash 2: `7dbf366ecd09c4e3f84f879e4a0b31b342c89d8da42f06839c675456958a1947`
+- Monto: 295.5 XLM (~$591 USDC equivalente)
+- Estado: ✅ Confirmadas en Stellar testnet
+
+## 📋 Estrategia de Implementación
+
+**Enfoque Práctico: Funcional Primero, IA Después**
+
+### Fase 1-3: MVP sin IA (Semanas 1-2)
+1. ✅ Transacciones blockchain funcionando
+2. 🔄 Autenticación biométrica (Passkeys)
+3. 🔄 Dashboard autenticado
+4. 🔄 Flujo completo de crédito (sin voz)
+
+### Fase 4: Mejora con IA (Semana 3 - Opcional)
+5. ⏭️ Asistente de voz
+6. ⏭️ Chat con IA
+7. ⏭️ Sugerencias inteligentes
+
+**Ventajas de este enfoque:**
+- ✅ MVP funcional más rápido
+- ✅ Sin dependencias de APIs externas inicialmente
+- ✅ Reducción de costos durante desarrollo
+- ✅ Base sólida antes de agregar IA
+- ✅ Si IA falla, el sistema sigue operativo
 
 ## 📋 Requisitos Previos
 

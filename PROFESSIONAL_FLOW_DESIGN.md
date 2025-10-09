@@ -1,7 +1,13 @@
-# 🏦 EBAS DApp - Professional Authentication & Credit Flow
+# 🏦 EBAS DApp - Flujo Profesional de Autenticación y Créditos
 
-## Overview
-Este documento define el flujo profesional completo para la DApp de créditos EBAS, integrando autenticación biométrica (Passkeys) con el sistema de scoring crediticio y asistente de IA.
+## Descripción General
+Este documento define el flujo profesional completo para la DApp de créditos EBAS, integrando autenticación biométrica (Passkeys) con el sistema de scoring crediticio.
+
+**ESTRATEGIA DE IMPLEMENTACIÓN:**
+1. **Fase 1-3**: Implementar flujo completo SIN IA (más rápido, funcional)
+2. **Fase 4**: Agregar capa de IA Voice como mejora (opcional)
+
+Esta estrategia permite tener un MVP funcional más rápido y después mejorar la experiencia con IA.
 
 ---
 
@@ -679,37 +685,227 @@ async function signTransaction(tx: Transaction, session: SecureSession) {
 
 ---
 
-## 🚀 Implementation Roadmap
+## 🚀 Implementation Roadmap (REVISED - IA al final)
 
-### Phase 1: Core Authentication (Week 1)
-- [x] Passkey registration
-- [x] Passkey login
-- [ ] Session management
-- [ ] Wallet connection
+### ⚡ ESTRATEGIA: Primero funcionalidad core, después IA
 
-### Phase 2: Dashboard & Profile (Week 1-2)
-- [ ] User dashboard
-- [ ] Credit score display
-- [ ] Loan history
-- [ ] Profile management
+> **Decisión de diseño**: Implementar primero el flujo completo con UI tradicional.
+> Una vez que todo funcione perfectamente, agregar la capa de IA Voice como enhancement.
+> Esto permite validar la UX y lógica de negocio antes de agregar complejidad.
 
-### Phase 3: Credit Flow (Week 2)
-- [ ] Income verification form
-- [ ] Score calculation
-- [ ] Loan configuration
-- [ ] Blockchain execution
+---
 
-### Phase 4: AI Integration (Week 3)
-- [ ] Voice input/output
-- [ ] AI assistant component
-- [ ] Intent detection
-- [ ] Function calling
+### Phase 1: Core Authentication (Week 1) 🔐
+**Objetivo**: Sistema de autenticación biométrica funcional
 
-### Phase 5: Polish & Launch (Week 4)
-- [ ] Animations & transitions
-- [ ] Error handling
-- [ ] Mobile optimization
-- [ ] Security audit
+- [ ] PasskeyRegistration component (UI tradicional)
+- [ ] PasskeyLogin component (UI tradicional)
+- [ ] Session management con localStorage/cookies
+- [ ] Wallet Stellar auto-generado al registrar
+- [ ] AuthGuard HOC para rutas protegidas
+- [ ] Re-authentication para acciones sensibles
+
+**Entregable**: Usuario puede registrarse y hacer login con huella/Face ID
+
+---
+
+### Phase 2: Dashboard & Profile (Week 1-2) 🏠
+**Objetivo**: Dashboard funcional después de login
+
+- [ ] AuthenticatedDashboard component
+- [ ] UserProfile card con datos
+- [ ] CreditScoreCard con gauge visual
+- [ ] LoanHistoryList con transacciones pasadas
+- [ ] QuickActions buttons (request loan, view score, etc)
+- [ ] Wallet balance display (XLM/USDC)
+- [ ] Logout functionality
+
+**Entregable**: Usuario autenticado ve su dashboard personalizado
+
+---
+
+### Phase 3: Credit Flow - Forms UI (Week 2) 📝
+**Objetivo**: Flujo completo de solicitud de préstamo (UI tradicional)
+
+**3.1 Income Verification**
+- [ ] IncomeVerificationForm component
+- [ ] Input fields (monthly income, platforms, experience)
+- [ ] Validation rules
+- [ ] Form submission to calculate score
+
+**3.2 Score Calculation**
+- [ ] Loading state con animación
+- [ ] ScoreResult component con gauge
+- [ ] Explanation de score (factors)
+- [ ] Conditional routing (>700 = continue, <700 = rejected)
+
+**3.3 Loan Configuration**
+- [ ] AmountSelector slider
+- [ ] PurposeSelector radio buttons
+- [ ] RepaymentPlanSelector (weekly/bi-weekly/monthly)
+- [ ] Real-time calculation de APR
+- [ ] Summary panel con detalles finales
+
+**3.4 Confirmation & Execution**
+- [ ] ReviewPanel con todos los detalles
+- [ ] Confirmation modal (double-check)
+- [ ] Transaction progress stepper
+- [ ] Integration con stellar-loan.ts
+- [ ] Success/Error states
+
+**Entregable**: Usuario puede solicitar préstamo de inicio a fin sin IA
+
+---
+
+### Phase 4: Polish & UX Improvements (Week 3) ✨
+**Objetivo**: Hacer la app production-ready
+
+- [ ] Animations & transitions (Framer Motion)
+- [ ] Loading states en todas las operaciones
+- [ ] Error handling comprehensivo
+- [ ] Toast notifications
+- [ ] Mobile responsive design
+- [ ] Dark mode (opcional)
+- [ ] Accessibility (a11y)
+- [ ] Stellar transaction links
+- [ ] Form persistence (si usuario abandona)
+
+**Entregable**: App profesional lista para usuarios reales
+
+---
+
+### Phase 5: Testing & Security (Week 3-4) 🔒
+**Objetivo**: Asegurar que todo funcione correctamente
+
+- [ ] Unit tests para componentes críticos
+- [ ] Integration tests para flujo completo
+- [ ] E2E tests con Playwright/Cypress
+- [ ] Security audit de WebAuthn implementation
+- [ ] Rate limiting en API routes
+- [ ] Input sanitization
+- [ ] Error logging (Sentry o similar)
+- [ ] Performance optimization
+
+**Entregable**: App segura y testeada
+
+---
+
+### Phase 6: AI Voice Layer (Week 4-5) 🎤
+**Objetivo**: Agregar IA como enhancement opcional
+
+> **Nota**: Esta fase se implementa DESPUÉS de que todo lo anterior funcione perfectamente.
+> La IA es un "nice to have" que mejora la UX, pero no es crítica para el core business.
+
+**6.1 Voice Infrastructure**
+- [ ] Web Speech API integration
+- [ ] OpenAI Whisper para transcripción
+- [ ] Text-to-Speech para respuestas
+- [ ] Voice activation button
+
+**6.2 AI Assistant Component**
+- [ ] VoiceAssistant component
+- [ ] ChatInterface fallback
+- [ ] Intent detection (OpenAI GPT-4)
+- [ ] Function calling setup
+
+**6.3 AI Enhancement per Step**
+- [ ] Income verification: "Dime tus ingresos..."
+- [ ] Loan config: "¿Cuánto necesitas?"
+- [ ] Review: "Confirma diciendo 'sí, acepto'"
+- [ ] Context awareness entre pasos
+
+**6.4 AI Features**
+- [ ] Financial education chatbot
+- [ ] Loan recommendations
+- [ ] Payment reminders
+- [ ] FAQ answering
+
+**Entregable**: IA voice fully integrated como alternativa a UI tradicional
+
+---
+
+### Phase 7: Launch & Monitor (Week 5+) 🚀
+- [ ] Deploy a producción
+- [ ] Analytics setup (PostHog, Mixpanel)
+- [ ] User feedback collection
+- [ ] A/B testing (con/sin IA)
+- [ ] Iteración basada en métricas
+
+---
+
+## 📊 Prioridades Revisadas
+
+### 🔴 CRITICAL (Must Have - Week 1-3)
+1. Autenticación con Passkeys ✅
+2. Dashboard autenticado ✅
+3. Flujo de crédito completo (forms) ✅
+4. Blockchain integration ✅
+5. Security & session management ✅
+
+### 🟡 IMPORTANT (Should Have - Week 3-4)
+1. Polish & animations
+2. Mobile optimization
+3. Error handling robusto
+4. Testing comprehensivo
+
+### 🟢 NICE TO HAVE (Could Have - Week 4-5)
+1. ✨ **IA Voice Assistant** (enhancement)
+2. Dark mode
+3. Advanced analytics
+4. Gamification
+
+---
+
+## 🎯 Benefits de este approach
+
+### ✅ Ventajas de implementar sin IA primero:
+
+1. **Más rápido**: Llegar a MVP funcional en 2-3 semanas vs 4-5
+2. **Menos complejidad**: Debuggear UI tradicional es más fácil
+3. **Validación temprana**: Probar la lógica de negocio sin variables de IA
+4. **Fallback natural**: Si IA falla, la app sigue funcionando
+5. **Progressive enhancement**: IA como feature flag activable
+6. **Testing más simple**: Tests de UI tradicional son más straightforward
+
+### ✅ IA como enhancement (Phase 6):
+
+- IA es **opcional**, no bloqueante
+- Usuario puede elegir: UI tradicional o Voice
+- Podemos lanzar sin IA y agregar después
+- Menos riesgo si IA tiene problemas
+- Más fácil iterar en UX sin IA primero
+
+---
+
+## 📝 Updated Component Priority
+
+### 🔴 Implementar AHORA (Phases 1-3):
+```
+✅ PasskeyRegistration
+✅ PasskeyLogin
+✅ AuthGuard
+✅ AuthenticatedDashboard
+✅ IncomeVerificationForm (sin voice)
+✅ ScoreCalculation
+✅ LoanConfiguration (sliders, selects)
+✅ ConfirmationModal
+✅ SuccessPage
+```
+
+### 🟡 Implementar DESPUÉS (Phase 4-5):
+```
+⏳ Animations
+⏳ Mobile optimization
+⏳ Testing suite
+⏳ Error boundaries
+```
+
+### 🟢 Implementar AL FINAL (Phase 6):
+```
+🎤 VoiceAssistant (opcional)
+🤖 AIReviewPanel (opcional)
+💬 ChatInterface (opcional)
+```
 
 ---
 
