@@ -26,8 +26,8 @@ const CreditScoringFlow: React.FC = () => {
   const [selectedLoanAmount, setSelectedLoanAmount] = useState<number>(0);
   
   // Mock user address - in real app this would come from wallet connection
-  // This is the official Stellar testnet example address from documentation
-  const mockUserAddress = 'GBRPYHIL2CI3FNQ4BXLFMNDLFJUNPU2HY3ZMFSHONUCEOASW7QC7OX2H';
+  // Using a valid testnet address (56 characters, starts with G)
+  const mockUserAddress = 'GDJYLRW4DZK7LVGCNAKBO42FGWVDRP2G7BEAXWWUC5E63ZENZ3RAPAKL';
 
   const handleStartSession = () => {
     setCurrentStep('income');
