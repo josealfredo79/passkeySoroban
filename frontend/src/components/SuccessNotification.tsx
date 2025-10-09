@@ -63,7 +63,7 @@ const SuccessNotification: React.FC<SuccessNotificationProps> = ({
           repayment_plan: 'monthly'
         };
 
-        const response = await fetch('/api/request-loan', {
+        const response = await fetch('/api/request-loan-real', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

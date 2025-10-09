@@ -25,21 +25,14 @@ interface LoanResponse {
 // Mock configuration (same as smart contract)
 const MOCK_POOL_BALANCE = 100000000000; // 10,000 USDC in stroops
 const MIN_CREDIT_SCORE = 700;
-const COOLDOWN_PERIOD = 86400; // 24 hours in seconds
+const COOLDOWN_PERIOD = 3600; // 1 hour in seconds (reduced for MVP demo)
 const MAX_LOAN_AMOUNT = 20000000000; // 2,000 USDC in stroops
 const MIN_LOAN_AMOUNT = 500000000;   // 50 USDC in stroops
 
-// Mock loan history (same as get-loan-data)
+// Mock loan history (empty for fresh start)
 const MOCK_LOAN_HISTORY: Record<string, any[]> = {
-  'GDRXE2BQUC2AOYSR7YQCLFQ7NOPQJBBQQY2YVMHM5YRIHVQMGDDDGKMC': [
-    {
-      recipient: 'GDRXE2BQUC2AOYSR7YQCLFQ7NOPQJBBQQY2YVMHM5YRIHVQMGDDDGKMC',
-      amount: 2000000000, // 200 USDC
-      credit_score: 780,
-      timestamp: Date.now() - 86400000, // 1 day ago
-      transaction_hash: 'abc123def456'
-    }
-  ]
+  // No pre-existing loans for demo purposes
+  // Users can request loans immediately without 24h restriction
 };
 
 // Mock pool balance tracker
@@ -144,17 +137,11 @@ function checkEligibility(userAddress: string, creditScore: number, amount: numb
     return { eligible: false, reason: 'Insufficient funds in loan pool' };
   }
   
-  // Check 24h cooldown
-  const userHistory = MOCK_LOAN_HISTORY[userAddress] || [];
-  if (userHistory.length > 0) {
-    const lastLoan = userHistory[userHistory.length - 1];
-    const timeSinceLastLoan = (Date.now() - lastLoan.timestamp) / 1000;
-    
-    if (timeSinceLastLoan < COOLDOWN_PERIOD) {
-      const hoursRemaining = Math.ceil((COOLDOWN_PERIOD - timeSinceLastLoan) / 3600);
-      return { eligible: false, reason: `Must wait ${hoursRemaining} more hours before requesting another loan` };
-    }
-  }
+  // Skip cooldown check for MVP demo to allow multiple loans
+  // This allows users to test the loan functionality multiple times
+  // In production, implement proper cooldown logic with persistent storage
+  // const userHistory = MOCK_LOAN_HISTORY[userAddress] || [];
+  // Cooldown verification disabled for MVP demonstration
   
   return { eligible: true };
 }

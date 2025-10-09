@@ -118,7 +118,7 @@ function calculateCreditScore(incomeData: IncomeData): CreditScoreResult {
   );
   const financialBehavior = calculateFinancialBehavior(
     incomeData.debt_to_income_ratio,
-    incomeData.hasSavings,
+    incomeData.has_savings,
     incomeData.employment_type
   );
   const platformDiversity = calculatePlatformDiversity(

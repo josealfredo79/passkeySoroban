@@ -73,11 +73,7 @@ const AdvancedPasskeyDemo: React.FC<AdvancedPasskeyDemoProps> = ({ onSuccess, on
       
       setBrowserSupport({
         supported: webauthnSupported,
-        details: {
-          webauthn: webauthnSupported,
-          windowsHello: windowsHelloSupported,
-          userAgent: navigator.userAgent,
-        }
+        platformAuthenticator: windowsHelloSupported,
       });
 
       // Verificar configuración de Stellar
