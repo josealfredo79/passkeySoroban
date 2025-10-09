@@ -79,9 +79,8 @@ export async function executeRealLoan(loanRequest: LoanRequest): Promise<LoanRes
     
     // Validate destination address format
     if (!StrKey.isValidEd25519PublicKey(userAddress)) {
-      // If still invalid, generate a valid test address for demo
-      console.log('⚠️ Invalid address, generating test address for demo');
-      userAddress = Keypair.random().publicKey();
+      console.error('❌ Invalid Stellar address provided:', userAddress);
+      throw new Error(`Invalid Stellar address: ${userAddress}. Must be a valid Ed25519 public key (starts with G)`);
     }
 
     console.log('✅ Using destination address:', userAddress);
@@ -117,10 +116,16 @@ export async function executeRealLoan(loanRequest: LoanRequest): Promise<LoanRes
     const repaymentDate = calculateRepaymentDate(loanRequest.repayment_plan);
     
     // Create native XLM transfer (simpler than USDC for MVP)
-    // Convert amount from USDC stroops to XLM lumens (1 USDC = 10 XLM for demo)
-    const xlmAmount = (loanRequest.amount / 10000000 * 10).toFixed(7);
+    // Convert amount from USDC stroops to XLM lumens
+    // Use reasonable amounts: 50-500 XLM to avoid reserve issues
+    // Stellar requires 2 XLM base reserve + 0.5 XLM per entry
+    const usdcAmount = loanRequest.amount / 10000000; // Convert stroops to USDC
     
-    console.log('💰 Transferring', xlmAmount, 'XLM to', userAddress);
+    // Scale down: 1 USDC = 0.5 XLM (instead of 0.1), capped at 500 XLM max
+    const xlmAmountRaw = Math.min(usdcAmount * 0.5, 500); // Max 500 XLM
+    const xlmAmount = xlmAmountRaw.toFixed(7);
+    
+    console.log('💰 Transferring', xlmAmount, 'XLM (~$', (parseFloat(xlmAmount) * 2).toFixed(2), 'USDC equivalent) to', userAddress);
     
     // Build transaction to transfer XLM
     const transaction = new TransactionBuilder(account, {
@@ -147,7 +152,37 @@ export async function executeRealLoan(loanRequest: LoanRequest): Promise<LoanRes
       result = await horizonServer.submitTransaction(transaction);
       console.log('✅ Transaction submitted successfully!', result.hash);
     } catch (error: any) {
-      console.error('Transaction submission failed:', error);
+      console.error('❌ Transaction submission failed:', error);
+      
+      // Parse Horizon error response for better debugging
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        console.error('📋 Horizon Error Details:', JSON.stringify(errorData, null, 2));
+        
+        if (errorData.extras?.result_codes) {
+          const codes = errorData.extras.result_codes;
+          const txCode = codes.transaction;
+          const opsCode = codes.operations?.[0];
+          
+          // Provide user-friendly error messages for common Horizon errors
+          let userMessage = 'Transaction failed';
+          
+          if (txCode === 'tx_insufficient_balance' || opsCode === 'op_underfunded') {
+            userMessage = 'Insufficient balance. The account does not have enough XLM to complete this transaction (minimum 2 XLM reserve required).';
+          } else if (txCode === 'tx_bad_seq') {
+            userMessage = 'Transaction sequence error. Please try again.';
+          } else if (opsCode === 'op_no_destination') {
+            userMessage = 'Destination account does not exist. Please verify the address.';
+          } else if (opsCode === 'op_line_full') {
+            userMessage = 'Destination account cannot receive more assets.';
+          } else if (txCode === 'tx_failed') {
+            userMessage = `Transaction rejected by network. Operation error: ${opsCode || 'unknown'}`;
+          }
+          
+          throw new Error(userMessage);
+        }
+      }
+      
       throw new Error(`Transaction failed: ${error.message || 'Unknown error'}`);
     }
 
