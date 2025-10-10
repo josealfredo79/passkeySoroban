@@ -99,9 +99,11 @@ export async function startRegistration(
           },
         ],
         authenticatorSelection: {
-          authenticatorAttachment: "platform", // Use platform authenticator (Face ID, Touch ID, etc.)
-          userVerification: "required",
+          // No especificar authenticatorAttachment permite usar cualquier autenticador
+          // Esto permite usar el navegador sin Windows Hello
+          userVerification: "discouraged", // Permite registro sin verificación biométrica
           residentKey: "preferred",
+          requireResidentKey: false,
         },
         timeout: 60000,
         attestation: "none", // We don't need attestation for this demo
@@ -198,7 +200,7 @@ export async function startAuthentication(): Promise<PasskeyResult> {
         challenge: challenge as BufferSource,
         allowCredentials,
         timeout: 60000,
-        userVerification: "required",
+        userVerification: "discouraged", // Permite autenticación sin verificación biométrica
         rpId: typeof window !== "undefined" ? window.location.hostname : "localhost",
       };
 
