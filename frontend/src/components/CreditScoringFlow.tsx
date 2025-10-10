@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LandingPage from './LandingPage';
 import IncomeDashboard from './IncomeDashboard';
 import CreditProfile from './CreditProfile';
 import SuccessNotification from './SuccessNotification';
+import { SessionManager } from '@/lib/session';
 
 type FlowStep = 'landing' | 'income' | 'credit' | 'success';
 
@@ -25,9 +26,21 @@ const CreditScoringFlow: React.FC = () => {
   const [incomeData, setIncomeData] = useState<IncomeData | null>(null);
   const [selectedLoanAmount, setSelectedLoanAmount] = useState<number>(0);
   
-  // Mock user address - in real app this would come from wallet connection
-  // Using a valid testnet address (56 characters, starts with G)
-  const mockUserAddress = 'GDJYLRW4DZK7LVGCNAKBO42FGWVDRP2G7BEAXWWUC5E63ZENZ3RAPAKL';
+  // Get REAL wallet address from authenticated session
+  const [userAddress, setUserAddress] = useState<string>('');
+
+  useEffect(() => {
+    // Get wallet address from authenticated session
+    const address = SessionManager.getWalletAddress();
+    if (address) {
+      setUserAddress(address);
+      console.log('✅ Using authenticated wallet:', address);
+    } else {
+      console.warn('⚠️ No authenticated wallet found, using fallback');
+      // Fallback to funded testnet address if no session (for testing)
+      setUserAddress('GDJYLRW4DZK7LVGCNAKBO42FGWVDRP2G7BEAXWWUC5E63ZENZ3RAPAKL');
+    }
+  }, []);
 
   const handleStartSession = () => {
     setCurrentStep('income');
@@ -85,10 +98,10 @@ const CreditScoringFlow: React.FC = () => {
         />
       )}
       
-      {currentStep === 'success' && (
+            {currentStep === 'success' && (
         <SuccessNotification
           loanAmount={selectedLoanAmount}
-          userAddress={mockUserAddress}
+          userAddress={userAddress}
           onStartOver={handleStartOver}
           onViewDashboard={handleViewDashboard}
         />

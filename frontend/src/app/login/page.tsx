@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
@@ -19,14 +19,14 @@ export default function LoginPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Iniciar Sesión</h1>
-          <p className="text-gray-600">Ingresa con tu Passkey</p>
+  <h1 className="text-3xl font-bold text-gray-800 mb-2">Iniciar sesión</h1>
+  <p className="text-gray-600">Accede con tu Passkey biométrico</p>
         </div>
 
-        {/* Auth Component */}
-        <PasskeyAuth />
+  {/* Componente de autenticación */}
+  <PasskeyAuth />
 
-        {/* Footer Links */}
+        {/* Enlaces de pie de página */}
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm mb-3">
             ¿No tienes cuenta?

@@ -11,19 +11,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Navigation Header */}
       <nav className="relative z-10 px-6 pt-6">
-        <div className="mx-auto max-w-7xl flex items-center justify-between">
+        <div className="mx-auto max-w-7xl flex items-center">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">🔐</span>
             </div>
             <span className="text-white font-bold text-xl">Soroban Passkey</span>
           </div>
-          <button
-            onClick={onStartSession}
-            className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg backdrop-blur-sm border border-white/20 transition-all duration-200 hover:scale-105"
-          >
-            Iniciar Sesión
-          </button>
         </div>
       </nav>
 

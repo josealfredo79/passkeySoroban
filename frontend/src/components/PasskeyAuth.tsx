@@ -1,40 +1,105 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { SessionManager } from "@/lib/session";
 import { usePasskey } from "@/hooks/usePasskey";
 
 export function PasskeyAuth() {
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState<string>("");
-  const { isSupported, createPasskey, authenticate, isLoading, error } =
-    usePasskey();
+  const router = useRouter();
+  
+  // Use REAL Passkey hook (WebAuthn)
+  const { isSupported, isLoading, error, createPasskey, authenticate, clearError } = usePasskey();
 
   const handleRegister = async () => {
     if (!username.trim()) {
-      setStatus("Please enter a username");
+      setStatus("❌ Por favor ingresa un nombre de usuario");
       return;
     }
 
-    setStatus("Creating passkey...");
-    const result = await createPasskey(username);
+    clearError();
+    setStatus("🔐 Creando Passkey con WebAuthn...");
 
-    if (result.success) {
-      setStatus(
-        `✅ Passkey created successfully! Credential ID: ${result.credentialId?.slice(0, 20)}...`
+    try {
+      // Create REAL Passkey using WebAuthn
+      const result = await createPasskey(username);
+
+      if (!result.success) {
+        setStatus(`❌ Error: ${result.error}`);
+        return;
+      }
+
+      setStatus("✅ Passkey creado! Creando sesión...");
+
+      // Create session with REAL credential ID
+      await SessionManager.createSession(
+        username,
+        result.credentialId!,
+        `${username}@ebas.demo`
       );
-    } else {
-      setStatus(`❌ Failed: ${result.error}`);
+
+      setStatus(`✅ ¡Registro exitoso! Bienvenido ${username}`);
+      
+      // Redirect to dashboard after 1 second
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1000);
+      
+    } catch (err) {
+      console.error('Registration error:', err);
+      setStatus(`❌ Error al registrar: ${err instanceof Error ? err.message : 'Error desconocido'}`);
     }
   };
 
   const handleAuthenticate = async () => {
-    setStatus("Authenticating...");
-    const result = await authenticate();
+    clearError();
+    setStatus("🔐 Autenticando con Passkey...");
 
-    if (result.success) {
-      setStatus(`✅ Authenticated successfully! User: ${result.userHandle}`);
-    } else {
-      setStatus(`❌ Failed: ${result.error}`);
+    try {
+      // Authenticate using REAL WebAuthn
+      const result = await authenticate();
+
+      if (!result.success) {
+        setStatus(`❌ Error: ${result.error}`);
+        return;
+      }
+
+      setStatus("✅ Autenticado! Verificando sesión...");
+
+      // Get stored credentials from localStorage to find username
+      const storedCreds = localStorage.getItem('passkey-credentials');
+      if (!storedCreds) {
+        setStatus("❌ No se encontraron credenciales guardadas");
+        return;
+      }
+
+      const credentials = JSON.parse(storedCreds);
+      const credential = credentials.find((c: any) => c.id === result.credentialId);
+      
+      if (!credential) {
+        setStatus("❌ Credencial no reconocida");
+        return;
+      }
+
+      // Create session with existing user
+      await SessionManager.createSession(
+        credential.username,
+        result.credentialId!,
+        credential.email
+      );
+
+      setStatus(`✅ ¡Bienvenido de vuelta, ${credential.username}!`);
+      
+      // Redirect to dashboard after 1 second
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1000);
+      
+    } catch (err) {
+      console.error('Authentication error:', err);
+      setStatus(`❌ Error al autenticar: ${err instanceof Error ? err.message : 'Error desconocido'}`);
     }
   };
 
@@ -62,33 +127,33 @@ export function PasskeyAuth() {
     <div className="glass rounded-2xl p-8 space-y-6">
       <div className="text-center mb-6">
         <h2 className="text-3xl font-bold mb-2 text-gray-800 dark:text-white">
-          Try It Out
+          Prueba el sistema
         </h2>
         <p className="text-gray-600 dark:text-gray-300">
-          Create or authenticate with a passkey
+          Crea o inicia sesión con tu Passkey
         </p>
       </div>
 
-      {/* Username Input */}
+      {/* Campo de usuario */}
       <div>
         <label
           htmlFor="username"
           className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
         >
-          Username
+          Usuario
         </label>
         <input
           id="username"
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          placeholder="Enter your username"
+          placeholder="Escribe tu usuario"
           className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
           disabled={isLoading}
         />
       </div>
 
-      {/* Action Buttons */}
+      {/* Botones de acción */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <button
           onClick={handleRegister}
@@ -98,7 +163,7 @@ export function PasskeyAuth() {
           {isLoading ? (
             <>
               <Spinner />
-              <span>Processing...</span>
+              <span>Procesando...</span>
             </>
           ) : (
             <>
@@ -115,7 +180,7 @@ export function PasskeyAuth() {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              <span>Create Passkey</span>
+              <span>Crear Passkey</span>
             </>
           )}
         </button>
@@ -128,7 +193,7 @@ export function PasskeyAuth() {
           {isLoading ? (
             <>
               <Spinner />
-              <span>Processing...</span>
+              <span>Procesando...</span>
             </>
           ) : (
             <>
@@ -145,13 +210,13 @@ export function PasskeyAuth() {
                   d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
                 />
               </svg>
-              <span>Authenticate</span>
+              <span>Autenticar</span>
             </>
           )}
         </button>
       </div>
 
-      {/* Status Display */}
+      {/* Mensaje de estado */}
       {(status || error) && (
         <div
           className={`p-4 rounded-lg ${
@@ -166,10 +231,10 @@ export function PasskeyAuth() {
         </div>
       )}
 
-      {/* Browser Info */}
+      {/* Info del navegador */}
       <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
         <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          🔒 Your biometric data never leaves your device
+          🔒 Tus datos biométricos nunca salen de tu dispositivo
         </p>
       </div>
     </div>

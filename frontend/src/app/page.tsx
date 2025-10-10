@@ -9,18 +9,8 @@ type AppMode = 'home' | 'passkey' | 'credit';
 export default function Home() {
   const [currentMode, setCurrentMode] = useState<AppMode>('home');
 
-  if (currentMode === 'passkey') {
-    return <SorobanPasskeyApp />;
-  }
-
-  if (currentMode === 'credit') {
-    return <CreditScoringFlow />;
-  }
-
-  // Home selector
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Navigation Header */}
       <nav className="relative z-10 px-6 pt-6">
         <div className="mx-auto max-w-7xl flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -32,75 +22,42 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <div className="relative z-10 px-6 pt-20 pb-16">
-        <div className="mx-auto max-w-4xl text-center">
+        <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-            Elige tu <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Demo</span>
+            Soroban MVP Demo
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-12">
-            Explora dos implementaciones completas en Stellar/Soroban
+          <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-12">
+            Esta aplicación demuestra el potencial de Stellar/Soroban para finanzas descentralizadas (DeFi) y autenticación biométrica avanzada.
           </p>
-
-          {/* Demo Cards */}
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Credit Scoring MVP */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all duration-300 group cursor-pointer"
-                 onClick={() => setCurrentMode('credit')}>
-              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform mx-auto">
-                <span className="text-3xl">💰</span>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Credit Scoring MVP</h3>
-              <p className="text-gray-300 leading-relaxed mb-6">
-                Sistema completo de préstamos instantáneos para trabajadores gig. 
-                Conecta apps de ingresos, calcula credit score y obtén USDC al instante.
-              </p>
-              <div className="space-y-2 text-sm text-gray-400 mb-6">
-                <div>✅ 3 APIs backend funcionando</div>
-                <div>✅ Credit scoring avanzado</div>
-                <div>✅ Smart contract desplegado</div>
-                <div>✅ UI completa: Landing → Income → Score → Loan</div>
-              </div>
-              <button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105">
-                Explorar MVP 🚀
-              </button>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 mt-8">
+            <h2 className="text-2xl font-bold text-white mb-4">¿Qué incluye?</h2>
+            <ul className="text-left text-gray-200 text-lg space-y-2 mx-auto max-w-xl mb-8">
+              <li>✅ Préstamos instantáneos para trabajadores gig</li>
+              <li>✅ Cálculo de credit score avanzado</li>
+              <li>✅ Contrato inteligente desplegado en testnet</li>
+              <li>✅ Autenticación biométrica con Passkey/WebAuthn</li>
+              <li>✅ Seguridad y privacidad: tus datos nunca salen de tu dispositivo</li>
+              <li>✅ UI moderna y responsiva</li>
+            </ul>
+            <div className="flex flex-col md:flex-row gap-4 justify-center mt-4">
+              <a
+                href="/register"
+                className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 shadow-lg text-lg"
+              >
+                Registro
+              </a>
+              <a
+                href="/login"
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 shadow-lg text-lg"
+              >
+                Login
+              </a>
             </div>
-
-            {/* Original Passkey Demo */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all duration-300 group cursor-pointer"
-                 onClick={() => setCurrentMode('passkey')}>
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform mx-auto">
-                <span className="text-3xl">🔐</span>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Soroban Passkey</h3>
-              <p className="text-gray-300 leading-relaxed mb-6">
-                Demo original de autenticación WebAuthn con Stellar. 
-                Crea cuentas usando biometría y gestiona transacciones de forma segura.
-              </p>
-              <div className="space-y-2 text-sm text-gray-400 mb-6">
-                <div>✅ WebAuthn/Passkey auth</div>
-                <div>✅ Stellar account creation</div>
-                <div>✅ Biometric security</div>
-                <div>✅ Transaction signing</div>
-              </div>
-              <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105">
-                Ver Demo Original
-              </button>
-            </div>
-          </div>
-
-          {/* Info Banner */}
-          <div className="mt-12 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-xl p-6">
-            <p className="text-purple-200 text-lg">
-              <span className="font-bold">Credit Scoring MVP</span> es la implementación principal - 
-              un sistema completo de préstamos que demuestra todo el potencial de Stellar/Soroban 
-              para aplicaciones DeFi reales.
-            </p>
           </div>
         </div>
       </div>
 
-      {/* Background Decorations */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-1000"></div>

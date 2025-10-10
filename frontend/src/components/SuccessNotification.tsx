@@ -349,7 +349,7 @@ const SuccessNotification: React.FC<SuccessNotificationProps> = ({
           </button>
           
           <button
-            onClick={onViewDashboard}
+            onClick={() => window.location.href = '/ebas-dashboard'}
             className="flex items-center justify-center space-x-2 px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all"
           >
             <Wallet className="w-5 h-5" />
