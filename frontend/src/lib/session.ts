@@ -6,6 +6,7 @@
 'use client';
 
 import { UserSession } from '@/types/session';
+import { Keypair } from '@stellar/stellar-sdk';
 
 const SESSION_KEY = 'ebas-session';
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
@@ -20,11 +21,58 @@ async function generateStellarWallet(): Promise<string> {
     // Dynamic import to avoid SSR issues
     const { Keypair } = await import('@stellar/stellar-sdk');
     const keypair = Keypair.random();
+    // Guardar clave privada y pública de forma cifrada en localStorage
+    if (typeof window !== 'undefined') {
+      // Cifrado simple para demo (en producción usar Web Crypto API)
+      const walletData = {
+        publicKey: keypair.publicKey(),
+        secret: btoa(keypair.secret()), // Cifrado base64 (solo demo)
+      };
+      localStorage.setItem(`stellar-wallet-${keypair.publicKey()}`, JSON.stringify(walletData));
+    }
     return keypair.publicKey();
   } catch (error) {
     console.error('Error generating Stellar wallet:', error);
     // Fallback to mock wallet if SDK fails
     return generateMockWallet();
+  }
+
+}
+
+/**
+ * Genera y persiste una clave Ed25519 para el usuario en el registro
+ * Retorna la dirección pública (wallet) y guarda la clave privada cifrada
+ */
+export async function generateAndPersistWallet(username: string): Promise<{ publicKey: string; secret: string }> {
+  const keypair = Keypair.random();
+  // Cifrado simple para demo (en producción usar Web Crypto API)
+  const walletData = {
+    publicKey: keypair.publicKey(),
+    secret: btoa(keypair.secret()),
+    username,
+    createdAt: new Date().toISOString()
+  };
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(`stellar-wallet-${username}`, JSON.stringify(walletData));
+  }
+  return { publicKey: keypair.publicKey(), secret: keypair.secret() };
+}
+
+/**
+ * Recupera la clave pública y privada Ed25519 asociada al usuario
+ */
+export function getWalletForUser(username: string): { publicKey: string; secret: string } | null {
+  if (typeof window === 'undefined') return null;
+  const walletRaw = localStorage.getItem(`stellar-wallet-${username}`);
+  if (!walletRaw) return null;
+  try {
+    const walletData = JSON.parse(walletRaw);
+    return {
+      publicKey: walletData.publicKey,
+      secret: atob(walletData.secret)
+    };
+  } catch {
+    return null;
   }
 }
 
@@ -41,6 +89,25 @@ function generateMockWallet(): string {
 
 export class SessionManager {
   /**
+   * Recuperar la clave privada de la wallet Stellar asociada al usuario
+   */
+  static getPrivateKey(): string | null {
+    const session = this.getSession();
+    if (!session) return null;
+    const publicKey = session.user.walletAddress;
+    if (typeof window !== 'undefined') {
+      const walletRaw = localStorage.getItem(`stellar-wallet-${publicKey}`);
+      if (!walletRaw) return null;
+      try {
+        const walletData = JSON.parse(walletRaw);
+        return walletData.secret ? atob(walletData.secret) : null;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+  /**
    * Create a new session after successful registration or login
    * For MVP, uses a shared funded testnet wallet
    * In production, would generate unique wallets per user
@@ -48,20 +115,36 @@ export class SessionManager {
   static async createSession(
     username: string,
     credentialId: string,
-    email?: string,
-    walletAddress?: string
+    email?: string
   ): Promise<UserSession> {
-    // For MVP: Use funded testnet wallet or generate new one
-    let wallet = walletAddress;
-    
-    if (!wallet) {
-      // Try to generate a real Stellar wallet
-      try {
-        wallet = await generateStellarWallet();
-      } catch {
-        // Fallback to funded testnet wallet for MVP
-        wallet = generateMockWallet();
+    // Recuperar o generar wallet Ed25519 para el usuario
+    let walletData = getWalletForUser(username);
+    if (!walletData) {
+      walletData = await generateAndPersistWallet(username);
+    }
+    const walletAddress = walletData.publicKey;
+
+    // Guardar credencial en array localStorage
+    if (typeof window !== 'undefined') {
+      let credentials = [];
+      const storedCreds = localStorage.getItem('passkey-credentials');
+      if (storedCreds) {
+        credentials = JSON.parse(storedCreds);
       }
+      let credIndex = credentials.findIndex((c: any) => c.username === username);
+      if (credIndex !== -1) {
+        credentials[credIndex].credentialId = credentialId;
+        credentials[credIndex].walletAddress = walletAddress;
+        credentials[credIndex].email = email;
+      } else {
+        credentials.push({
+          username,
+          credentialId,
+          email,
+          walletAddress
+        });
+      }
+      localStorage.setItem('passkey-credentials', JSON.stringify(credentials));
     }
 
     const session: UserSession = {
@@ -70,7 +153,7 @@ export class SessionManager {
         id: crypto.randomUUID(),
         username,
         email,
-        walletAddress: wallet,
+        walletAddress,
         credentialId
       },
       passkey: {

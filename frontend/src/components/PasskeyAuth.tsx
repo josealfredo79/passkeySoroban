@@ -33,16 +33,41 @@ export function PasskeyAuth() {
 
       setStatus("✅ Passkey creado! Creando sesión...");
 
-      // Create session with REAL credential ID
-      await SessionManager.createSession(
-        username,
-        result.credentialId!,
-        `${username}@ebas.demo`
-      );
+      // Buscar si ya existe credencial para este usuario
+      let credentials = [];
+      const storedCreds = localStorage.getItem('passkey-credentials');
+      if (storedCreds) {
+        credentials = JSON.parse(storedCreds);
+      }
+      let credIndex = credentials.findIndex((c: any) => c.username === username);
+      let walletAddress;
+      if (credIndex !== -1 && credentials[credIndex].walletAddress) {
+        // Si ya existe, reutilizar la wallet y actualizar credentialId si cambió
+        walletAddress = credentials[credIndex].walletAddress;
+        if (credentials[credIndex].credentialId !== result.credentialId) {
+          credentials[credIndex].credentialId = result.credentialId!;
+          localStorage.setItem('passkey-credentials', JSON.stringify(credentials));
+        }
+      } else {
+        // Si no existe, crear nueva wallet derivada de la clave pública y asociar
+        walletAddress = await SessionManager.createSession(
+          username,
+          result.credentialId!,
+          `${username}@ebas.demo`,
+          undefined,
+          result.publicKey // <-- derivar desde la clave pública
+        ).then(s => s.user.walletAddress);
+        credentials.push({
+          username,
+          credentialId: result.credentialId!,
+          email: `${username}@ebas.demo`,
+          walletAddress
+        });
+        localStorage.setItem('passkey-credentials', JSON.stringify(credentials));
+      }
 
       setStatus(`✅ ¡Registro exitoso! Bienvenido ${username}`);
-      
-      // Redirect to dashboard after 1 second
+      // Redirigir al dashboard
       setTimeout(() => {
         router.push('/dashboard');
       }, 1000);
@@ -76,23 +101,33 @@ export function PasskeyAuth() {
       }
 
       const credentials = JSON.parse(storedCreds);
-      const credential = credentials.find((c: any) => c.id === result.credentialId);
-      
+  // Buscar por username
+  const credential = credentials.find((c: any) => c.username === username);
+
       if (!credential) {
         setStatus("❌ Credencial no reconocida");
         return;
       }
 
-      // Create session with existing user
+
+      // Recuperar wallet asociada al usuario
+      let walletAddress = credential.walletAddress;
+      if (!walletAddress) {
+        // Si no existe, crear una nueva (solo la primera vez)
+        walletAddress = await SessionManager.getWalletAddress();
+      }
+
+      // Crear sesión con la wallet recuperada
       await SessionManager.createSession(
         credential.username,
         result.credentialId!,
-        credential.email
+        credential.email || `${credential.username}@ebas.demo`,
+        walletAddress
       );
 
       setStatus(`✅ ¡Bienvenido de vuelta, ${credential.username}!`);
-      
-      // Redirect to dashboard after 1 second
+
+      // Redirect to dashboard after 1 segundo
       setTimeout(() => {
         router.push('/dashboard');
       }, 1000);
