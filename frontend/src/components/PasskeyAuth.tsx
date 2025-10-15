@@ -14,7 +14,8 @@ export function PasskeyAuth() {
   const { isSupported, isLoading, error, createPasskey, authenticate, clearError } = usePasskey();
 
   const handleRegister = async () => {
-    if (!username.trim()) {
+    const normalizedUsername = username.trim().toLowerCase();
+    if (!normalizedUsername) {
       setStatus("❌ Por favor ingresa un nombre de usuario");
       return;
     }
@@ -39,28 +40,27 @@ export function PasskeyAuth() {
       if (storedCreds) {
         credentials = JSON.parse(storedCreds);
       }
-      let credIndex = credentials.findIndex((c: any) => c.username === username);
+      let credIndex = credentials.findIndex((c: any) => c.username === normalizedUsername);
       let walletAddress;
       if (credIndex !== -1 && credentials[credIndex].walletAddress) {
         // Si ya existe, reutilizar la wallet y actualizar credentialId si cambió
         walletAddress = credentials[credIndex].walletAddress;
-        if (credentials[credIndex].credentialId !== result.credentialId) {
-          credentials[credIndex].credentialId = result.credentialId!;
-          localStorage.setItem('passkey-credentials', JSON.stringify(credentials));
-        }
+        credentials[credIndex].credentialId = result.credentialId!;
+        credentials[credIndex].email = `${normalizedUsername}@ebas.demo`;
+        localStorage.setItem('passkey-credentials', JSON.stringify(credentials));
       } else {
         // Si no existe, crear nueva wallet derivada de la clave pública y asociar
         walletAddress = await SessionManager.createSession(
-          username,
+          normalizedUsername,
           result.credentialId!,
-          `${username}@ebas.demo`,
+          `${normalizedUsername}@ebas.demo`,
           undefined,
-          result.publicKey // <-- derivar desde la clave pública
+          result.publicKey
         ).then(s => s.user.walletAddress);
         credentials.push({
-          username,
+          username: normalizedUsername,
           credentialId: result.credentialId!,
-          email: `${username}@ebas.demo`,
+          email: `${normalizedUsername}@ebas.demo`,
           walletAddress
         });
         localStorage.setItem('passkey-credentials', JSON.stringify(credentials));
@@ -94,6 +94,7 @@ export function PasskeyAuth() {
       setStatus("✅ Autenticado! Verificando sesión...");
 
       // Get stored credentials from localStorage to find username
+      const normalizedUsername = username.trim().toLowerCase();
       const storedCreds = localStorage.getItem('passkey-credentials');
       if (!storedCreds) {
         setStatus("❌ No se encontraron credenciales guardadas");
@@ -101,11 +102,19 @@ export function PasskeyAuth() {
       }
 
       const credentials = JSON.parse(storedCreds);
-  // Buscar por username
-  const credential = credentials.find((c: any) => c.username === username);
-
+      // Buscar por username normalizado
+      let credential = credentials.find((c: any) => c.username === normalizedUsername);
+      // Si no existe, buscar por credentialId (por si el usuario cambió el nombre)
+      if (!credential && result.credentialId) {
+        credential = credentials.find((c: any) => c.credentialId === result.credentialId);
+        // Si se encuentra, actualizar el nombre de usuario
+        if (credential) {
+          credential.username = normalizedUsername;
+          localStorage.setItem('passkey-credentials', JSON.stringify(credentials));
+        }
+      }
       if (!credential) {
-        setStatus("❌ Credencial no reconocida");
+        setStatus("❌ Credencial no reconocida. Por favor registra tu Passkey primero.");
         return;
       }
 
