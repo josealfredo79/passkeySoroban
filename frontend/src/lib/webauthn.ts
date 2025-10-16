@@ -126,13 +126,24 @@ export async function startRegistration(
 
     // Store credential ID in localStorage for later authentication
     if (typeof window !== "undefined") {
-      const credentials =
-        JSON.parse(localStorage.getItem("passkey-credentials") || "[]") || [];
+      // Generar y persistir wallet antes de guardar la credencial
+      let walletAddress = undefined;
+      try {
+        const { SessionManager } = require("@/lib/session");
+        const walletData = await SessionManager.generateAndPersistWallet(username);
+        walletAddress = walletData.publicKey;
+      } catch (e) {
+        console.error("No se pudo generar wallet:", e);
+      }
+      let credentials = JSON.parse(localStorage.getItem("passkey-credentials") || "[]") || [];
+      // Eliminar credenciales duplicadas para el mismo usuario
+      credentials = credentials.filter((c: any) => c.username !== username);
       credentials.push({
         credentialId,
         username,
         userId: bufferToBase64Url(userId),
         createdAt: new Date().toISOString(),
+        walletAddress,
       });
       localStorage.setItem("passkey-credentials", JSON.stringify(credentials));
     }

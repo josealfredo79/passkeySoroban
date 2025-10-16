@@ -38,7 +38,25 @@ function DashboardContent() {
   };
 
   const handleLogout = () => {
+    // Limpiar sesión
     SessionManager.clearSession();
+    // Limpiar credenciales y wallet del usuario actual
+    if (session && session.user && session.user.username) {
+      // Eliminar credencial asociada
+      const storedCreds = localStorage.getItem('passkey-credentials');
+      if (storedCreds) {
+        let credentials = JSON.parse(storedCreds);
+        credentials = credentials.filter((c: any) => c.username !== session.user.username);
+        localStorage.setItem('passkey-credentials', JSON.stringify(credentials));
+      }
+      // Eliminar wallet asociada
+      const walletsRaw = localStorage.getItem('user-wallets');
+      if (walletsRaw) {
+        let wallets = JSON.parse(walletsRaw);
+        delete wallets[session.user.username];
+        localStorage.setItem('user-wallets', JSON.stringify(wallets));
+      }
+    }
     router.push('/');
   };
 

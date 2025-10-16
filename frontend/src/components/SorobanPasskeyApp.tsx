@@ -17,56 +17,36 @@ interface PasskeyData {
 
 const SorobanPasskeyApp: React.FC = () => {
   const [currentView, setCurrentView] = useState<AppView>('landing');
-  const [passkeyData, setPasskeyData] = useState<PasskeyData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Verificar si hay datos guardados al cargar la aplicación
+  // MCP: Verificar si hay sesión oficial al cargar la aplicación
   useEffect(() => {
-    const checkExistingSession = () => {
+    const checkMcpSession = () => {
       try {
-        const savedData = localStorage.getItem('passkey-data');
-        if (savedData) {
-          const parsedData = JSON.parse(savedData);
-          if (parsedData.credentialId && parsedData.publicKey) {
-            setPasskeyData(parsedData);
-            setCurrentView('dashboard');
-          }
+        const { SessionManager } = require('@/lib/session');
+        const session = SessionManager.getSession();
+        if (session && session.authenticated && session.user) {
+          setCurrentView('dashboard');
         }
       } catch (error) {
-        console.warn('Error loading saved session:', error);
-        localStorage.removeItem('passkey-data');
+        console.warn('Error loading MCP session:', error);
       } finally {
         setLoading(false);
       }
     };
-
-    checkExistingSession();
+    checkMcpSession();
   }, []);
 
   // Manejar el éxito en la autenticación/registro
-  const handleAuthSuccess = (data: PasskeyData) => {
-    setPasskeyData(data);
+  const handleAuthSuccess = () => {
     setCurrentView('dashboard');
-    
-    // Guardar en localStorage
-    try {
-      localStorage.setItem('passkey-data', JSON.stringify(data));
-    } catch (error) {
-      console.warn('Error saving session data:', error);
-    }
   };
 
   // Manejar cerrar sesión
   const handleLogout = () => {
-    setPasskeyData(null);
+    const { SessionManager } = require('@/lib/session');
+    SessionManager.clearSession();
     setCurrentView('landing');
-    
-    // Limpiar localStorage
-    try {
-      localStorage.removeItem('passkey-data');
-    } catch (error) {
-      console.warn('Error clearing session data:', error);
-    }
   };
 
   // Navegar a la vista de autenticación
@@ -95,7 +75,6 @@ const SorobanPasskeyApp: React.FC = () => {
   switch (currentView) {
     case 'landing':
       return <LandingPage onStartSession={handleStartSession} />;
-    
     case 'auth':
       return (
         <AdvancedPasskeyDemo 
@@ -103,19 +82,22 @@ const SorobanPasskeyApp: React.FC = () => {
           onBack={handleBackToLanding}
         />
       );
-    
-    case 'dashboard':
-      return passkeyData ? (
+    case 'dashboard': {
+      // MCP: Leer datos de sesión oficial
+      const { SessionManager } = require('@/lib/session');
+      const session = SessionManager.getSession();
+      if (!session || !session.user) return null;
+      return (
         <Dashboard 
-          passkeyData={passkeyData}
+          passkeyData={session.user}
           onLogout={handleLogout}
           onAuthenticate={() => {
             // Aquí podrías implementar una nueva autenticación
             console.log('Initiating new authentication...');
           }}
         />
-      ) : null;
-    
+      );
+    }
     default:
       return <LandingPage onStartSession={handleStartSession} />;
   }
