@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import VoiceAssistant from '@/components/VoiceAssistant';
 
 interface LandingPageProps {
   onStartSession: () => void;
@@ -34,7 +35,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Conecta tus apps de ingresos (Uber, Rappi, DiDi, Deliveroo) y obtén un préstamo 
+              Conecta tus apps de ingresos (Uber, Rappi, DiDi, Deliveroo) y obtén un préstamo
               al instante basado en tu historial real. Credit scoring inteligente + Stellar Blockchain.
             </p>
           </div>
@@ -87,7 +88,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
               </div>
               <h3 className="text-xl font-bold text-white mb-4">Credit Scoring Inteligente</h3>
               <p className="text-gray-300 leading-relaxed">
-                Algoritmo avanzado que analiza tus ingresos de múltiples plataformas, 
+                Algoritmo avanzado que analiza tus ingresos de múltiples plataformas,
                 estabilidad laboral y comportamiento financiero para calcular tu score real.
               </p>
             </div>
@@ -101,7 +102,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
               </div>
               <h3 className="text-xl font-bold text-white mb-4">Desembolso Instantáneo</h3>
               <p className="text-gray-300 leading-relaxed">
-                Préstamos procesados en segundos usando smart contracts en Stellar. 
+                Préstamos procesados en segundos usando smart contracts en Stellar.
                 Recibe USDC directamente en tu wallet sin intermediarios.
               </p>
             </div>
@@ -115,7 +116,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
               </div>
               <h3 className="text-xl font-bold text-white mb-4">Autenticación Biométrica</h3>
               <p className="text-gray-300 leading-relaxed">
-                Seguridad máxima con Windows Hello, TouchID o llaves físicas. 
+                Seguridad máxima con Windows Hello, TouchID o llaves físicas.
                 Tu clave privada nunca sale de tu dispositivo.
               </p>
             </div>
@@ -129,7 +130,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
           <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-16">
             ¿Cómo Funciona? <span className="text-green-400">Solo 3 Pasos</span>
           </h2>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className="relative text-center">
@@ -138,7 +139,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
               </div>
               <h3 className="text-xl font-bold text-white mb-4">Conecta tus Apps</h3>
               <p className="text-gray-300 leading-relaxed">
-                Conecta Uber, Rappi, DiDi, Deliveroo y otras apps de trabajo. 
+                Conecta Uber, Rappi, DiDi, Deliveroo y otras apps de trabajo.
                 Analizamos tus ingresos de los últimos 6 meses de forma segura.
               </p>
               <div className="absolute -right-4 top-8 hidden md:block">
@@ -155,7 +156,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
               </div>
               <h3 className="text-xl font-bold text-white mb-4">Obtén tu Score</h3>
               <p className="text-gray-300 leading-relaxed">
-                Nuestro algoritmo calcula tu credit score en tiempo real basado en 
+                Nuestro algoritmo calcula tu credit score en tiempo real basado en
                 estabilidad de ingresos, diversidad de plataformas y experiencia.
               </p>
               <div className="absolute -right-4 top-8 hidden md:block">
@@ -172,12 +173,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
               </div>
               <h3 className="text-xl font-bold text-white mb-4">Recibe tu USDC</h3>
               <p className="text-gray-300 leading-relaxed">
-                Si calificas (score ≥700), recibe el préstamo instantáneamente en tu wallet. 
+                Si calificas (score ≥700), recibe el préstamo instantáneamente en tu wallet.
                 Tasas desde 6% APR según tu perfil crediticio.
               </p>
             </div>
           </div>
-          
+
           {/* Supported Platforms */}
           <div className="mt-16 text-center">
             <h3 className="text-lg font-semibold text-gray-300 mb-8">Plataformas Soportadas</h3>
@@ -211,7 +212,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-12">
             Powered by <span className="text-purple-400">Cutting-Edge Technology</span>
           </h2>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {/* Tech Icons */}
             <div className="flex flex-col items-center space-y-3 group">
@@ -220,21 +221,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
               </div>
               <span className="text-gray-300 font-medium">WebAuthn</span>
             </div>
-            
+
             <div className="flex flex-col items-center space-y-3 group">
               <div className="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-white/20 transition-all">
                 <span className="text-2xl">⭐</span>
               </div>
               <span className="text-gray-300 font-medium">Stellar</span>
             </div>
-            
+
             <div className="flex flex-col items-center space-y-3 group">
               <div className="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-white/20 transition-all">
                 <span className="text-2xl">🚀</span>
               </div>
               <span className="text-gray-300 font-medium">Soroban</span>
             </div>
-            
+
             <div className="flex flex-col items-center space-y-3 group">
               <div className="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-white/20 transition-all">
                 <span className="text-2xl">🔒</span>
@@ -250,6 +251,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartSession }) => {
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-500"></div>
+      </div>
+
+      {/* Voice Assistant Section */}
+      <div className="relative z-10 px-6 py-20">
+        <div className="mx-auto max-w-4xl text-center">
+          <h2 className="text-2xl font-bold text-white mb-8">Bienvenido a EBAS</h2>
+          <VoiceAssistant />
+        </div>
       </div>
     </div>
   );

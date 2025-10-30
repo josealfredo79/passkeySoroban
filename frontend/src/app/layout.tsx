@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import React from "react";
+import VoiceAssistantWidget from "@/components/VoiceAssistantWidget";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,6 +20,8 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased min-h-screen">
         {children}
+        {/* VoiceAssistant flotante en toda la app */}
+        <VoiceAssistantWidget />
       </body>
     </html>
   );
