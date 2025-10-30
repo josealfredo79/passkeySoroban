@@ -4,7 +4,10 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   const { prompt } = await req.json();
   // Permitir usar la API key directamente en desarrollo para pruebas rápidas
-  const apiKey = process.env.CLAUDE_API_KEY || "***REMOVED***6S46LBCKSfpDrX8s5sTnpwkHVMBVqH8ocqTs4QTfOdwvJRYXu1il3OJUFZXCksfOko6q0qHkChUTmIo4_GCtFQ-cTGt3AAA";
+  const apiKey = process.env.CLAUDE_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json({ text: "CLAUDE_API_KEY no configurada" }, { status: 500 });
+  }
   if (!apiKey) {
     return NextResponse.json({ text: "CLAUDE_API_KEY no configurada" }, { status: 500 });
   }

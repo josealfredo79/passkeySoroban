@@ -6,9 +6,12 @@ export async function POST(req: Request) {
   const systemPrompt = "Eres un asistente financiero virtual muy amigable. Tu tarea es guiar al usuario paso a paso para solicitar un préstamo, pidiendo solo la información necesaria en cada paso (monto, plazo, ingresos, etc.). Responde de forma clara, breve y positiva. Si el usuario no da suficiente información, haz preguntas específicas para avanzar el proceso. Si el usuario tiene dudas, explícalas de manera sencilla.";
   const fullPrompt = `${systemPrompt}\nUsuario: ${prompt}`;
   // Permitir usar la API key directamente en desarrollo para pruebas rápidas
-    // Forzar el uso de la clave correcta, sin variable de entorno
-    const apiKey = "***REMOVED***zzs-7SOPQAYVPItojF5ShkeQtS6iQowvLXo_srAZmvaBl94laMDpwHOTnIvArJ7OXZX09akEDJNjzX7WsxuyKQ-Nr9SRAAA";
-    console.log("[DEBUG] Claude API Key usada:", apiKey, "Longitud:", apiKey.length);
+    // Usar solo variable de entorno para la API key (seguro para GitHub)
+    const apiKey = process.env.CLAUDE_API_KEY;
+    console.log("[DEBUG] Claude API Key usada:", apiKey, "Longitud:", apiKey ? apiKey.length : 0);
+    if (!apiKey) {
+      return NextResponse.json({ text: "CLAUDE_API_KEY no configurada" }, { status: 500 });
+    }
   console.log("[DEBUG] Claude API Key usada:", apiKey, "Longitud:", apiKey.length);
   if (!apiKey) {
     return NextResponse.json({ text: "CLAUDE_API_KEY no configurada" }, { status: 500 });
