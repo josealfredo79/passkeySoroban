@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const { prompt } = await req.json();
+  // Prompt de sistema amigable para guiar el flujo de préstamo
+  const systemPrompt = "Eres un asistente financiero virtual muy amigable. Tu tarea es guiar al usuario paso a paso para solicitar un préstamo, pidiendo solo la información necesaria en cada paso (monto, plazo, ingresos, etc.). Responde de forma clara, breve y positiva. Si el usuario no da suficiente información, haz preguntas específicas para avanzar el proceso. Si el usuario tiene dudas, explícalas de manera sencilla.";
+  const fullPrompt = `${systemPrompt}\nUsuario: ${prompt}`;
   // Permitir usar la API key directamente en desarrollo para pruebas rápidas
     // Forzar el uso de la clave correcta, sin variable de entorno
     const apiKey = "***REMOVED***zzs-7SOPQAYVPItojF5ShkeQtS6iQowvLXo_srAZmvaBl94laMDpwHOTnIvArJ7OXZX09akEDJNjzX7WsxuyKQ-Nr9SRAAA";
@@ -22,7 +25,7 @@ export async function POST(req: Request) {
         model: "claude-3-haiku-20240307",
         max_tokens: 1024,
         messages: [
-          { "role": "user", "content": prompt }
+          { "role": "user", "content": fullPrompt }
         ]
       })
     });
