@@ -1,3 +1,29 @@
+# 🧪 Pruebas End-to-End (E2E) para Desarrolladores
+
+Este proyecto incluye tests E2E profesionales con Playwright para validar el flujo seguro MCP y WebAuthn en el frontend.
+
+**Importante:** Los usuarios finales NO necesitan ejecutar ni instalar Playwright. Estas pruebas son exclusivas para el equipo de desarrollo y QA, para asegurar la calidad antes de liberar la aplicación.
+
+## Ejecución de tests E2E
+
+1. Instala Playwright:
+  ```bash
+  cd frontend
+  npm install -D @playwright/test
+  npx playwright install
+  ```
+2. Ejecuta los tests:
+  ```bash
+  npx playwright test --config playwright.config.ts
+  ```
+3. Revisa el reporte HTML en la carpeta `playwright-report`.
+
+## ¿Por qué son importantes?
+- Validan que cada usuario tenga su propia sesión y wallet.
+- Garantizan que el dashboard muestre los datos correctos según el contexto MCP.
+- Evitan regresiones y errores antes de liberar nuevas versiones.
+
+Para dudas o soporte, contacta al equipo de desarrollo.
 # 🔐 Soroban Passkey Authentication Demo
 
 Implementación completa de autenticación con Passkeys (WebAuthn) para contratos inteligentes de Soroban en la blockchain de Stellar.

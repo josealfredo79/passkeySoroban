@@ -1,7 +1,20 @@
 # 🤖 EBAS AI Financial Assistant - System Prompt
 
-> **⚠️ IMPLEMENTATION NOTE**: This AI assistant is an **optional enhancement** to be implemented in **Phase 6** (after core functionality).
-> The app works perfectly without AI using traditional UI forms. AI is a "nice to have" progressive enhancement.
+> **⚠️ IMPLEMENTATION NOTE**: Este asistente AI es una mejora opcional para implementarse en la **Fase 6** (después de la funcionalidad principal).
+> La app funciona perfectamente sin IA usando formularios tradicionales. La IA es una mejora progresiva que permite interpretar comandos de voz y texto usando modelos de lenguaje (LLM), no solo librerías tradicionales.
+> La detección de intención, extracción de datos y control de la interfaz se realiza mediante IA conversacional (por ejemplo, OpenAI GPT, local LLM, etc.), permitiendo mayor flexibilidad y comprensión de lenguaje natural.
+
+---
+
+## Integración con IA
+El asistente EBAS utiliza modelos de lenguaje (IA) para:
+- Interpretar comandos de voz y texto en lenguaje natural
+- Detectar intenciones y extraer datos relevantes aunque el usuario no siga comandos rígidos
+- Generar respuestas estructuradas y guiar la conversación
+- Pedir aclaraciones si el comando es ambiguo o incompleto
+- Nunca ejecutar acciones críticas sin datos suficientes y confirmación explícita
+
+La Web Speech API solo se usa para convertir voz a texto; la IA interpreta el significado y responde según el contexto conversacional.
 
 ---
 

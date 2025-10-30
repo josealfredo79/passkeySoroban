@@ -103,9 +103,11 @@ impl CustomAccountInterface for WebAuthnAccount {
         let payload_hash = env.crypto().sha256(&payload);
 
         // Verificar la firma secp256r1
-        // Nota: En una implementación real, necesitarías usar secp256r1_verify
-        // Por ahora, usamos una verificación placeholder
-        // env.crypto().secp256r1_verify(&pk, &payload_hash, &signature.signature);
+        // Implementación real usando secp256r1_verify
+        let is_valid = env.crypto().secp256r1_verify(&pk, &payload_hash, &signature.signature);
+        if !is_valid {
+            return Err(Error::Secp256r1SignatureParse);
+        }
 
         // Parsear el client_data_json para extraer el challenge
         let client_data_json_bytes = signature.client_data_json.to_buffer::<1024>();
@@ -113,10 +115,17 @@ impl CustomAccountInterface for WebAuthnAccount {
             core::str::from_utf8(&client_data_json_bytes).map_err(|_| Error::JsonParseError)?;
 
         // Verificar que el challenge coincide con el signature_payload
-        // En una implementación completa, necesitarías:
-        // 1. Decodificar base64url del challenge
-        // 2. Comparar con signature_payload
-        // 3. Verificar otros campos de client_data_json
+        // Decodificar el challenge de client_data_json
+        let challenge_marker = "\"challenge\":\"";
+        let challenge_start = client_data_json_str.find(challenge_marker).ok_or(Error::ClientDataJsonChallengeIncorrect)? + challenge_marker.len();
+        let challenge_end = client_data_json_str[challenge_start..].find('"').ok_or(Error::ClientDataJsonChallengeIncorrect)? + challenge_start;
+        let challenge_b64 = &client_data_json_str[challenge_start..challenge_end];
+        // Decodificar base64url
+        let challenge_bytes = base64::decode_config(challenge_b64, base64::URL_SAFE_NO_PAD).map_err(|_| Error::ClientDataJsonChallengeIncorrect)?;
+        // Comparar con signature_payload
+        if challenge_bytes != signature_payload.to_array() {
+            return Err(Error::ClientDataJsonChallengeIncorrect);
+        }
 
         // Validación de longitud de firma
         if signature.signature.len() != 64 {

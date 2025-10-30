@@ -128,10 +128,11 @@ impl LoanContract {
             timestamp,
         };
 
-        // Note: In production, you would actually invoke the token contract here
-        // to transfer tokens. For MVP, we're simulating the transfer.
-        // Example:
-        // token_client.transfer(&config.pool_address, &recipient, &amount);
+    // Transferencia real de tokens usando el contrato de tokens
+    // Instanciar el cliente del contrato de tokens
+    let token_client = TokenClient::new(&env, &config.token_address);
+    // Realizar la transferencia del pool al destinatario
+    token_client.transfer(&config.pool_address, &recipient, &amount);
 
         Ok(result)
     }
