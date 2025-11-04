@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { detectIntent } from "../lib/intent-detection";
 import { buildResponse, AssistantResponse } from "../lib/response-builder";
 import { startAuthentication } from "@simplewebauthn/browser";
+import { useVoice } from "../hooks/useVoice";
 
 interface Message {
   role: "user" | "assistant";
@@ -18,6 +19,19 @@ const SmartAssistant: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+
+  // Voice functionality
+  const {
+    isListening,
+    isSpeaking,
+    transcript,
+    error: voiceError,
+    isSupported: isVoiceSupported,
+    startListening,
+    stopListening,
+    speak,
+    stopSpeaking,
+  } = useVoice({ lang: "es-ES", continuous: false, interimResults: true });
 
   useEffect(() => {
     // Check authentication
@@ -34,7 +48,23 @@ const SmartAssistant: React.FC = () => {
         response: welcomeResponse,
       },
     ]);
+
+    // Speak welcome message if voice is supported
+    if (isVoiceSupported) {
+      speak(welcomeResponse.text);
+    }
   }, [pathname]);
+
+  // Handle voice transcript
+  useEffect(() => {
+    if (transcript) {
+      setInput(transcript);
+      // Auto-send after receiving transcript
+      setTimeout(() => {
+        handleSendWithText(transcript);
+      }, 500);
+    }
+  }, [transcript]);
 
   const executeAction = async (response: AssistantResponse) => {
     if (!response.action) return;
@@ -105,18 +135,18 @@ const SmartAssistant: React.FC = () => {
     }
   };
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSendWithText = (text: string) => {
+    if (!text.trim()) return;
 
     const userMessage: Message = {
       role: "user",
-      content: input,
+      content: text,
     };
 
     setMessages((prev) => [...prev, userMessage]);
 
     // Detect intent
-    const intent = detectIntent(input);
+    const intent = detectIntent(text);
     const aiResponse = buildResponse(intent, isAuthenticated, pathname || "/");
 
     const assistantMessage: Message = {
@@ -126,12 +156,22 @@ const SmartAssistant: React.FC = () => {
     };
 
     setMessages((prev) => [...prev, assistantMessage]);
-    setInput("");
+
+    // Speak the response
+    if (isVoiceSupported) {
+      speak(aiResponse.text);
+    }
 
     // Execute action if auto-execute is enabled
     if (aiResponse.action && !aiResponse.needsConfirmation) {
       executeAction(aiResponse);
     }
+  };
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+    handleSendWithText(input);
+    setInput("");
   };
 
   const handleQuickReply = (value: string) => {
@@ -239,24 +279,88 @@ const SmartAssistant: React.FC = () => {
 
       {/* Input */}
       <div className="p-4 border-t border-gray-200">
+        {/* Voice status indicator */}
+        {voiceError && (
+          <div className="mb-2 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
+            ⚠️ {voiceError}
+          </div>
+        )}
+        
+        {isListening && (
+          <div className="mb-2 px-3 py-2 bg-purple-50 border border-purple-200 rounded-lg text-xs text-purple-700 flex items-center gap-2">
+            <span className="animate-pulse">🎤</span>
+            <span>Escuchando... habla ahora</span>
+          </div>
+        )}
+
+        {isSpeaking && (
+          <div className="mb-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700 flex items-center gap-2">
+            <span className="animate-pulse">🔊</span>
+            <span>Hablando...</span>
+          </div>
+        )}
+
         <div className="flex gap-2">
+          {/* Voice button */}
+          {isVoiceSupported && (
+            <button
+              onClick={isListening ? stopListening : startListening}
+              disabled={isSpeaking}
+              className={`px-3 py-2 rounded-lg transition-all text-sm font-medium ${
+                isListening
+                  ? "bg-red-600 text-white hover:bg-red-700 animate-pulse"
+                  : isSpeaking
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-purple-600 text-white hover:bg-purple-700"
+              }`}
+              title={isListening ? "Detener grabación" : "Hablar"}
+            >
+              {isListening ? "⏹️" : "🎤"}
+            </button>
+          )}
+
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Escribe tu mensaje..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            onKeyPress={(e) => e.key === "Enter" && !isListening && handleSend()}
+            placeholder={isListening ? "Escuchando..." : "Escribe o habla..."}
+            disabled={isListening}
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-100 disabled:text-gray-500"
           />
+          
+          {/* Stop speaking button */}
+          {isSpeaking && (
+            <button
+              onClick={stopSpeaking}
+              className="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium"
+              title="Detener voz"
+            >
+              🔇
+            </button>
+          )}
+
           <button
             onClick={handleSend}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            disabled={isListening || !input.trim()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             Enviar
           </button>
         </div>
-        <p className="text-xs text-gray-500 mt-2 text-center">
-          Prueba: &quot;quiero registrarme&quot; o &quot;necesito un préstamo&quot;
+        
+        <p className="text-xs text-gray-500 mt-2 text-center flex items-center justify-center gap-2">
+          {isVoiceSupported ? (
+            <>
+              <span>💬 Escribe</span>
+              <span>•</span>
+              <span>🎤 Habla</span>
+              <span>•</span>
+              <span>🔊 El asistente responde con voz</span>
+            </>
+          ) : (
+            <span>Escribe tu mensaje (voz no disponible en este navegador)</span>
+          )}
         </p>
       </div>
     </div>

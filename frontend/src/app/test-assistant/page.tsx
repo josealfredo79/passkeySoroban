@@ -88,10 +88,10 @@ export default function TestAssistantPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 p-6 rounded-lg">
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 p-6 rounded-lg mb-6">
             <h3 className="font-bold text-green-900 mb-2 flex items-center gap-2">
               <span>✨</span>
-              <span>Características</span>
+              <span>Características de Texto</span>
             </h3>
             <ul className="text-sm text-green-700 space-y-2">
               <li><strong>Quick Replies:</strong> Botones de respuesta rápida con íconos</li>
@@ -100,6 +100,31 @@ export default function TestAssistantPage() {
               <li><strong>Extracción de entidades:</strong> Detecta montos, monedas y nombres de usuario</li>
               <li><strong>Contexto adaptativo:</strong> Respuestas diferentes según autenticación y ruta actual</li>
             </ul>
+          </div>
+
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-l-4 border-purple-500 p-6 rounded-lg">
+            <h3 className="font-bold text-purple-900 mb-2 flex items-center gap-2">
+              <span>🎤</span>
+              <span>Funcionalidad de Voz (Web Speech API)</span>
+            </h3>
+            <ul className="text-sm text-purple-700 space-y-2">
+              <li><strong>🎤 Entrada por voz:</strong> Presiona el botón del micrófono y habla</li>
+              <li><strong>🔊 Respuestas habladas:</strong> El asistente responde con voz automáticamente</li>
+              <li><strong>⏹️ Control total:</strong> Detén la grabación o la reproducción en cualquier momento</li>
+              <li><strong>🌐 Idioma español:</strong> Optimizado para reconocimiento en español (México)</li>
+              <li><strong>✅ Soporte nativo:</strong> No requiere instalaciones adicionales</li>
+              <li><strong>🔴 Indicadores visuales:</strong> Animaciones que muestran cuándo está escuchando o hablando</li>
+            </ul>
+            <div className="mt-4 p-3 bg-white/50 rounded">
+              <p className="text-xs text-purple-600 font-semibold mb-1">Cómo usar la voz:</p>
+              <ol className="text-xs text-purple-700 space-y-1 list-decimal list-inside">
+                <li>Haz clic en el botón 🎤 del micrófono</li>
+                <li>Cuando veas &quot;Escuchando...&quot; habla tu mensaje</li>
+                <li>El texto se transcribirá automáticamente</li>
+                <li>El asistente responderá por texto y voz</li>
+                <li>Usa 🔇 para detener la voz si lo necesitas</li>
+              </ol>
+            </div>
           </div>
         </div>
       </div>
