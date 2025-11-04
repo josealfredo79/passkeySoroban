@@ -1,5 +1,5 @@
 "use client";
-import VoiceAssistant from "./VoiceAssistant";
+import SmartAssistant from "./SmartAssistant";
 
 import { useState } from "react";
 
@@ -17,7 +17,7 @@ export default function VoiceAssistantWidget() {
               title="Cerrar asistente"
             >✖️</button>
           </div>
-          <VoiceAssistant />
+          <SmartAssistant />
         </div>
       ) : (
         <button
