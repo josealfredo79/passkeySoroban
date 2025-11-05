@@ -6,6 +6,7 @@ import { detectIntent } from "../lib/intent-detection";
 import { buildResponse, AssistantResponse } from "../lib/response-builder";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { useVoice } from "../hooks/useVoice";
+import { useElevenLabsTTS } from "../hooks/useElevenLabsTTS";
 
 interface Message {
   role: "user" | "assistant";
@@ -20,18 +21,23 @@ const SmartAssistant: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Voice functionality
+  // Voice functionality - Speech Recognition
   const {
     isListening,
-    isSpeaking,
     transcript,
     error: voiceError,
     isSupported: isVoiceSupported,
     startListening,
     stopListening,
+  } = useVoice({ lang: "es-ES", continuous: false, interimResults: true });
+
+  // Voice functionality - Text to Speech (ElevenLabs)
+  const {
+    isSpeaking,
     speak,
     stopSpeaking,
-  } = useVoice({ lang: "es-ES", continuous: false, interimResults: true });
+    error: ttsError,
+  } = useElevenLabsTTS();
 
   useEffect(() => {
     // Check authentication
@@ -280,9 +286,38 @@ const SmartAssistant: React.FC = () => {
       {/* Input */}
       <div className="p-4 border-t border-gray-200">
         {/* Voice status indicator */}
-        {voiceError && (
+        {(voiceError || ttsError) && (
           <div className="mb-2 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
-            ⚠️ {voiceError}
+            <div className="font-semibold mb-1">⚠️ Error de Voz</div>
+            <div className="mb-2">{voiceError || ttsError}</div>
+            {voiceError?.includes('Edge necesita configuración') && (
+              <div className="mt-2 pt-2 border-t border-red-300 bg-yellow-50 p-2 rounded">
+                <div className="font-semibold mb-1">🔧 Configuración de Edge:</div>
+                <ol className="list-decimal list-inside space-y-1 text-xs">
+                  <li>Presiona <kbd className="px-1 py-0.5 bg-gray-200 rounded">Alt+F</kbd> → Settings</li>
+                  <li>Busca "Languages" en la barra de búsqueda</li>
+                  <li>Click en "Add languages" y agrega "Español"</li>
+                  <li>Marca la opción "Offer to translate..."</li>
+                  <li>Reinicia Edge</li>
+                </ol>
+                <div className="mt-2 text-xs bg-green-100 p-2 rounded">
+                  💡 <strong>Atajo rápido:</strong> Copia y pega en Edge: <code className="bg-white px-1 py-0.5 rounded">edge://settings/languages</code>
+                </div>
+              </div>
+            )}
+            {(voiceError?.includes('no soporta') && !voiceError?.includes('Edge')) && (
+              <div className="mt-2 pt-2 border-t border-red-300">
+                <div className="font-semibold mb-1">✅ Navegadores Recomendados:</div>
+                <ul className="list-disc list-inside space-y-1 text-xs">
+                  <li><strong>Google Chrome</strong> - Funciona sin configuración</li>
+                  <li><strong>Microsoft Edge</strong> - Reconocimiento local</li>
+                  <li><strong>Safari</strong> (macOS/iOS) - Funciona offline</li>
+                </ul>
+                <div className="mt-2 text-xs bg-red-100 p-2 rounded">
+                  ❌ <strong>Firefox</strong> tiene soporte limitado de voz en español
+                </div>
+              </div>
+            )}
           </div>
         )}
         
@@ -326,7 +361,7 @@ const SmartAssistant: React.FC = () => {
             onKeyPress={(e) => e.key === "Enter" && !isListening && handleSend()}
             placeholder={isListening ? "Escuchando..." : "Escribe o habla..."}
             disabled={isListening}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-100 disabled:text-gray-500"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-100 disabled:text-gray-500 text-gray-900 placeholder:text-gray-400"
           />
           
           {/* Stop speaking button */}

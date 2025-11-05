@@ -21,9 +21,11 @@
     "base64url": "^3.0.1",
     "bigint-conversion": "^2.4.3",
     "cbor-x": "^1.6.0",
+    "elevenlabs": "^1.59.0",
     "lucide-react": "^0.545.0",
     "next": "14.2.15",
     "node-fetch": "^3.3.2",
+    "openai": "^6.8.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "zustand": "^4.5.5"
