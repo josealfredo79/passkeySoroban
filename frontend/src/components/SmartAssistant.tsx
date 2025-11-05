@@ -24,6 +24,7 @@ const SmartAssistant: React.FC = () => {
   const hasInitialized = React.useRef(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const [voiceEnabled, setVoiceEnabled] = useState(false); // Control manual de voz - DESACTIVADO por defecto
+  const lastSpeechTextRef = React.useRef<string>(""); // Prevenir doble voz del mismo texto
 
   // Voice functionality - Speech Recognition ONLY (es-MX for better Edge compatibility)
   // NO usar el speak() de useVoice para evitar doble voz
@@ -183,7 +184,9 @@ const SmartAssistant: React.FC = () => {
 
     // Solo hablar si el usuario tiene la voz habilitada
     // Usar SOLO ElevenLabs para evitar doble voz
-    if (voiceEnabled) {
+    // Prevenir que el mismo texto se hable dos veces
+    if (voiceEnabled && lastSpeechTextRef.current !== aiResponse.text) {
+      lastSpeechTextRef.current = aiResponse.text;
       stopElevenLabs(); // Stop any previous audio
       speakElevenLabs(aiResponse.text);
     }
@@ -216,7 +219,9 @@ const SmartAssistant: React.FC = () => {
 
       // Solo hablar si el usuario tiene la voz habilitada
       // Usar SOLO ElevenLabs para evitar doble voz
-      if (voiceEnabled) {
+      // Prevenir que el mismo texto se hable dos veces
+      if (voiceEnabled && lastSpeechTextRef.current !== aiResponse.text) {
+        lastSpeechTextRef.current = aiResponse.text;
         stopElevenLabs();
         speakElevenLabs(aiResponse.text);
       }
