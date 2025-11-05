@@ -81,6 +81,10 @@ const SmartAssistant: React.FC = () => {
       lastTranscriptRef.current = transcript;
       setInput(transcript);
       
+      // IMPORTANTE: Detener el micrófono inmediatamente después de capturar
+      // Esto previene que el micrófono capture la respuesta del asistente
+      stopListening();
+      
       // Auto-send after receiving transcript (only once)
       const timer = setTimeout(() => {
         handleSendWithText(transcript);
@@ -187,7 +191,14 @@ const SmartAssistant: React.FC = () => {
     // Prevenir que el mismo texto se hable dos veces
     if (voiceEnabled && lastSpeechTextRef.current !== aiResponse.text) {
       lastSpeechTextRef.current = aiResponse.text;
+      
+      // CRÍTICO: Asegurar que el micrófono está apagado antes de hablar
+      // Esto previene el loop de retroalimentación (micrófono captura altavoz)
+      stopListening();
       stopElevenLabs(); // Stop any previous audio
+      
+      // Hablar y NO reactivar el micrófono automáticamente
+      // El usuario debe presionar el botón nuevamente si quiere continuar
       speakElevenLabs(aiResponse.text);
     }
 
@@ -222,6 +233,9 @@ const SmartAssistant: React.FC = () => {
       // Prevenir que el mismo texto se hable dos veces
       if (voiceEnabled && lastSpeechTextRef.current !== aiResponse.text) {
         lastSpeechTextRef.current = aiResponse.text;
+        
+        // CRÍTICO: Detener micrófono para prevenir feedback loop
+        stopListening();
         stopElevenLabs();
         speakElevenLabs(aiResponse.text);
       }
