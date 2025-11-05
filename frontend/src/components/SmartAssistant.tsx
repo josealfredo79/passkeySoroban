@@ -22,8 +22,11 @@ const SmartAssistant: React.FC = () => {
   const pathname = usePathname();
   const lastTranscriptRef = React.useRef<string>("");
   const hasInitialized = React.useRef(false);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const [voiceEnabled, setVoiceEnabled] = useState(false); // Control manual de voz - DESACTIVADO por defecto
 
-  // Voice functionality - Speech Recognition (es-MX for better Edge compatibility)
+  // Voice functionality - Speech Recognition ONLY (es-MX for better Edge compatibility)
+  // NO usar el speak() de useVoice para evitar doble voz
   const {
     isListening,
     transcript,
@@ -31,13 +34,14 @@ const SmartAssistant: React.FC = () => {
     isSupported: isVoiceSupported,
     startListening,
     stopListening,
+    // NO destructuramos speak ni stopSpeaking de useVoice
   } = useVoice({ lang: "es-MX", continuous: false, interimResults: true });
 
-  // Voice functionality - Text to Speech (ElevenLabs)
+  // Voice functionality - Text to Speech (ElevenLabs) - ÚNICA fuente de audio
   const {
     isSpeaking,
-    speak,
-    stopSpeaking,
+    speak: speakElevenLabs,
+    stopSpeaking: stopElevenLabs,
     error: ttsError,
   } = useElevenLabsTTS();
 
@@ -61,13 +65,14 @@ const SmartAssistant: React.FC = () => {
       },
     ]);
 
-    // Speak welcome message if voice is supported (with a small delay)
-    if (isVoiceSupported) {
-      setTimeout(() => {
-        speak(welcomeResponse.text);
-      }, 500);
-    }
+    // NO hablar el mensaje de bienvenida automáticamente
+    // El usuario puede escucharlo con el botón de voz si quiere
   }, []);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   // Handle voice transcript - Prevent duplicate processing
   useEffect(() => {
@@ -176,10 +181,11 @@ const SmartAssistant: React.FC = () => {
 
     setMessages((prev) => [...prev, assistantMessage]);
 
-    // Speak the response (stop any previous speech first)
-    if (isVoiceSupported) {
-      stopSpeaking(); // Stop any previous audio
-      speak(aiResponse.text);
+    // Solo hablar si el usuario tiene la voz habilitada
+    // Usar SOLO ElevenLabs para evitar doble voz
+    if (voiceEnabled) {
+      stopElevenLabs(); // Stop any previous audio
+      speakElevenLabs(aiResponse.text);
     }
 
     // Execute action if auto-execute is enabled
@@ -207,6 +213,13 @@ const SmartAssistant: React.FC = () => {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+
+      // Solo hablar si el usuario tiene la voz habilitada
+      // Usar SOLO ElevenLabs para evitar doble voz
+      if (voiceEnabled) {
+        stopElevenLabs();
+        speakElevenLabs(aiResponse.text);
+      }
 
       if (aiResponse.action) {
         executeAction(aiResponse);
@@ -295,6 +308,8 @@ const SmartAssistant: React.FC = () => {
             )}
           </div>
         ))}
+        {/* Scroll anchor */}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}
@@ -385,6 +400,24 @@ const SmartAssistant: React.FC = () => {
             </button>
           )}
 
+          {/* Toggle voice response button */}
+          {isVoiceSupported && (
+            <button
+              onClick={() => {
+                setVoiceEnabled(!voiceEnabled);
+                if (voiceEnabled) stopElevenLabs(); // Stop if disabling
+              }}
+              className={`px-3 py-2 rounded-lg transition-all text-sm font-medium ${
+                voiceEnabled
+                  ? "bg-green-600 text-white hover:bg-green-700"
+                  : "bg-gray-400 text-white hover:bg-gray-500"
+              }`}
+              title={voiceEnabled ? "Voz activada (click para desactivar)" : "Voz desactivada (click para activar)"}
+            >
+              {voiceEnabled ? "🔊" : "🔇"}
+            </button>
+          )}
+
           <input
             type="text"
             value={input}
@@ -394,17 +427,6 @@ const SmartAssistant: React.FC = () => {
             disabled={isListening}
             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-100 disabled:text-gray-500 text-gray-900 placeholder:text-gray-400"
           />
-          
-          {/* Stop speaking button */}
-          {isSpeaking && (
-            <button
-              onClick={stopSpeaking}
-              className="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium"
-              title="Detener voz"
-            >
-              🔇
-            </button>
-          )}
 
           <button
             onClick={handleSend}
@@ -422,7 +444,7 @@ const SmartAssistant: React.FC = () => {
               <span>•</span>
               <span>🎤 Habla</span>
               <span>•</span>
-              <span>🔊 El asistente responde con voz</span>
+              <span>{voiceEnabled ? "🔊 Voz activada" : "🔇 Voz desactivada"}</span>
             </>
           ) : (
             <span>Escribe tu mensaje (voz no disponible en este navegador)</span>
