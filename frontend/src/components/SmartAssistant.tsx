@@ -20,6 +20,8 @@ const SmartAssistant: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const lastTranscriptRef = React.useRef<string>("");
+  const hasInitialized = React.useRef(false);
 
   // Voice functionality - Speech Recognition (es-MX for better Edge compatibility)
   const {
@@ -40,6 +42,10 @@ const SmartAssistant: React.FC = () => {
   } = useElevenLabsTTS();
 
   useEffect(() => {
+    // Only initialize once to prevent duplicate welcome messages
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
     // Check authentication
     const token = localStorage.getItem("authToken");
     setIsAuthenticated(!!token);
@@ -55,20 +61,27 @@ const SmartAssistant: React.FC = () => {
       },
     ]);
 
-    // Speak welcome message if voice is supported
+    // Speak welcome message if voice is supported (with a small delay)
     if (isVoiceSupported) {
-      speak(welcomeResponse.text);
-    }
-  }, [pathname]);
-
-  // Handle voice transcript
-  useEffect(() => {
-    if (transcript) {
-      setInput(transcript);
-      // Auto-send after receiving transcript
       setTimeout(() => {
-        handleSendWithText(transcript);
+        speak(welcomeResponse.text);
       }, 500);
+    }
+  }, []);
+
+  // Handle voice transcript - Prevent duplicate processing
+  useEffect(() => {
+    if (transcript && transcript.trim() && transcript !== lastTranscriptRef.current) {
+      lastTranscriptRef.current = transcript;
+      setInput(transcript);
+      
+      // Auto-send after receiving transcript (only once)
+      const timer = setTimeout(() => {
+        handleSendWithText(transcript);
+        setInput(""); // Clear input after sending
+      }, 500);
+      
+      return () => clearTimeout(timer);
     }
   }, [transcript]);
 
@@ -163,8 +176,9 @@ const SmartAssistant: React.FC = () => {
 
     setMessages((prev) => [...prev, assistantMessage]);
 
-    // Speak the response
+    // Speak the response (stop any previous speech first)
     if (isVoiceSupported) {
+      stopSpeaking(); // Stop any previous audio
       speak(aiResponse.text);
     }
 

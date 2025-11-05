@@ -92,6 +92,7 @@ export function useVoice(config: VoiceConfig = {}): UseVoiceReturn {
 
       recognitionRef.current.onend = () => {
         setIsListening(false);
+        console.log('🎤 Recognition ended');
       };
 
       recognitionRef.current.onerror = (event: any) => {
