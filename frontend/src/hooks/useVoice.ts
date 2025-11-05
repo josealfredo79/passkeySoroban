@@ -69,25 +69,17 @@ export function useVoice(config: VoiceConfig = {}): UseVoiceReturn {
         speechSynthesis.addEventListener('voiceschanged', loadVoices);
       }
 
-      // Configure recognition
-      recognitionRef.current.lang = lang;
+      // Configure recognition - Simple setup like octocat-AR-T
+      // Use 'es-MX' for better compatibility with Edge/Brave/Chrome
+      recognitionRef.current.lang = 'es-MX';
       recognitionRef.current.continuous = continuous;
       recognitionRef.current.interimResults = interimResults;
+      recognitionRef.current.maxAlternatives = 1;
 
-      // Try to enable on-device recognition (Chrome 130+)
-      // This prevents "network" errors when offline or with slow connection
-      if ('processLocally' in recognitionRef.current) {
-        try {
-          (recognitionRef.current as any).processLocally = true;
-          console.log('✅ On-device speech recognition enabled');
-        } catch (err) {
-          console.log('⚠️ On-device recognition not available, using cloud service');
-        }
-      }
-
-      // Log supported languages info
-      console.log('🎤 Speech Recognition initialized with language:', lang);
-      console.log('📍 Browser:', navigator.userAgent.includes('Chrome') ? 'Chrome/Edge' : 
+      console.log('🎤 Speech Recognition initialized');
+      console.log('📍 Language: es-MX');
+      console.log('📍 Browser:', navigator.userAgent.includes('Edg') ? 'Edge' : 
+                                   navigator.userAgent.includes('Chrome') ? 'Chrome/Brave' : 
                                    navigator.userAgent.includes('Firefox') ? 'Firefox' : 
                                    navigator.userAgent.includes('Safari') ? 'Safari' : 'Unknown');
 
@@ -119,23 +111,15 @@ export function useVoice(config: VoiceConfig = {}): UseVoiceReturn {
             errorMessage = "No se pudo capturar audio. Verifica que tu micrófono esté conectado y funcionando.";
             break;
           case 'network':
-            errorMessage = "Error de conexión. Chrome usa reconocimiento en la nube que requiere internet. Intenta: 1) Verificar tu conexión, 2) Usar un navegador con soporte local como Edge, 3) Permitir acceso en la configuración de Chrome.";
+            // Según MDN: Chrome/Edge necesitan internet para el reconocimiento en la nube
+            // o usar processLocally=true con paquetes de idioma instalados
+            errorMessage = "❌ Sin conexión a internet. Chrome/Edge necesitan internet para reconocimiento de voz. Soluciones: 1) Verifica tu conexión WiFi/Ethernet, 2) Recarga la página, 3) Usa el modo escritura mientras tanto.";
             break;
           case 'aborted':
             errorMessage = "Reconocimiento de voz cancelado.";
             break;
           case 'language-not-supported':
-            // Detect if user is on Edge/Chrome and provide specific solution
-            const isEdge = navigator.userAgent.includes('Edg');
-            const isChrome = navigator.userAgent.includes('Chrome') && !isEdge;
-            
-            if (isEdge) {
-              errorMessage = `Edge necesita configuración: 1) Ve a edge://settings/languages, 2) Agrega "Español" si no está, 3) Marca "Ofrecer traducción", 4) Reinicia Edge. O prueba con Chrome que funciona sin configuración.`;
-            } else if (isChrome) {
-              errorMessage = `Chrome necesita internet para reconocimiento de voz. Verifica tu conexión o habilita reconocimiento local en chrome://flags.`;
-            } else {
-              errorMessage = `Tu navegador no soporta reconocimiento de voz en español. Soluciones: 1) Usar Chrome/Edge, 2) Actualizar navegador, 3) Verificar idioma del sistema.`;
-            }
+            errorMessage = "Idioma no soportado. Verifica que Edge tenga español configurado en edge://settings/languages o prueba recargar la página.";
             break;
           default:
             errorMessage = `Error: ${event.error}`;
@@ -172,38 +156,29 @@ export function useVoice(config: VoiceConfig = {}): UseVoiceReturn {
     setError(null);
 
     try {
-      // Request microphone permission first (modern approach)
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-          .then(() => {
-            // Permission granted, start recognition
+      // Simple approach like octocat-AR-T repo
+      recognitionRef.current.start();
+      console.log('🎤 Listo para escuchar...');
+    } catch (err: any) {
+      // Handle case where recognition is already started
+      if (err.name === 'InvalidStateError') {
+        console.log('Recognition already started, stopping and restarting...');
+        try {
+          recognitionRef.current.stop();
+          setTimeout(() => {
             try {
               recognitionRef.current.start();
-            } catch (err: any) {
-              // Handle case where recognition is already started
-              if (err.name === 'InvalidStateError') {
-                console.log('Recognition already started, stopping and restarting...');
-                recognitionRef.current.stop();
-                setTimeout(() => {
-                  recognitionRef.current.start();
-                }, 100);
-              } else {
-                console.error("Error starting recognition:", err);
-                setError("Error al iniciar reconocimiento de voz: " + err.message);
-              }
+            } catch (e) {
+              console.error("Error restarting recognition:", e);
             }
-          })
-          .catch((err) => {
-            console.error("Microphone permission denied:", err);
-            setError("Permiso de micrófono denegado. Por favor, permite el acceso al micrófono.");
-          });
+          }, 100);
+        } catch (e) {
+          console.error("Error stopping recognition:", e);
+        }
       } else {
-        // Fallback for older browsers
-        recognitionRef.current.start();
+        console.error("Error starting recognition:", err);
+        setError("Error al iniciar reconocimiento de voz: " + err.message);
       }
-    } catch (err: any) {
-      console.error("Error starting recognition:", err);
-      setError("Error al iniciar reconocimiento de voz: " + (err.message || err));
     }
   }, [isListening]);
 

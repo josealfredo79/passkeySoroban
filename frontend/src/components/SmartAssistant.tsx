@@ -21,7 +21,7 @@ const SmartAssistant: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Voice functionality - Speech Recognition
+  // Voice functionality - Speech Recognition (es-MX for better Edge compatibility)
   const {
     isListening,
     transcript,
@@ -29,7 +29,7 @@ const SmartAssistant: React.FC = () => {
     isSupported: isVoiceSupported,
     startListening,
     stopListening,
-  } = useVoice({ lang: "es-ES", continuous: false, interimResults: true });
+  } = useVoice({ lang: "es-MX", continuous: false, interimResults: true });
 
   // Voice functionality - Text to Speech (ElevenLabs)
   const {
@@ -290,6 +290,23 @@ const SmartAssistant: React.FC = () => {
           <div className="mb-2 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
             <div className="font-semibold mb-1">⚠️ Error de Voz</div>
             <div className="mb-2">{voiceError || ttsError}</div>
+            
+            {/* Error de conexión a internet */}
+            {voiceError?.includes('Sin conexión') && (
+              <div className="mt-2 pt-2 border-t border-red-300 bg-blue-50 p-2 rounded">
+                <div className="font-semibold mb-1">🌐 Verifica tu Conexión:</div>
+                <ol className="list-decimal list-inside space-y-1 text-xs">
+                  <li>Asegúrate de estar conectado a WiFi o Ethernet</li>
+                  <li>Prueba abrir otra página web para verificar</li>
+                  <li>Recarga esta página (F5 o Ctrl+R)</li>
+                  <li>Mientras tanto, puedes <strong>escribir</strong> tus mensajes</li>
+                </ol>
+                <div className="mt-2 text-xs bg-green-100 p-2 rounded">
+                  💡 <strong>Nota:</strong> Chrome/Edge necesitan internet la primera vez para descargar el modelo de voz español. Después funcionará offline.
+                </div>
+              </div>
+            )}
+            
             {voiceError?.includes('Edge necesita configuración') && (
               <div className="mt-2 pt-2 border-t border-red-300 bg-yellow-50 p-2 rounded">
                 <div className="font-semibold mb-1">🔧 Configuración de Edge:</div>

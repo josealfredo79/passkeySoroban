@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Sistema de Detección de Intenciones</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .demo-box {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, background 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .quick-examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .quick-btn {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .result-section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .intent-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .confidence-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .confidence-high { background: #4caf50; color: white; }
+        .confidence-medium { background: #ff9800; color: white; }
+        .confidence-low { background: #f44336; color: white; }
+        
+        .result-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .suggestion-chip {
+            padding: 8px 15px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .quick-reply-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .quick-reply-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .json-view {
+            background: #263238;
+            color: #aed581;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            white-space: pre;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Demo del Sistema de Intenciones</h1>
+            <p>Prueba el sistema de detección de intenciones en tiempo real</p>
+        </div>
+        
+        <div class="demo-box">
+            <div class="input-section">
+                <h3 style="margin-bottom: 15px;">Escribe un mensaje:</h3>
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="userInput" 
+                        placeholder="Ejemplo: quiero registrarme, necesito un préstamo, etc."
+                        onkeypress="if(event.key==='Enter') detectIntentDemo()"
+                    />
+                    <button onclick="detectIntentDemo()">🚀 Detectar</button>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <strong>Prueba estos ejemplos rápidos:</strong>
+                    <div class="quick-examples">
+                        <button class="quick-btn" onclick="testPhrase('quiero registrarme')">📝 Registrarme</button>
+                        <button class="quick-btn" onclick="testPhrase('iniciar sesión')">🔐 Login</button>
+                        <button class="quick-btn" onclick="testPhrase('necesito un préstamo de 1000 XLM')">💰 Préstamo</button>
+                        <button class="quick-btn" onclick="testPhrase('cuánto tengo')">💳 Saldo</button>
+                        <button class="quick-btn" onclick="testPhrase('hola')">👋 Saludo</button>
+                        <button class="quick-btn" onclick="testPhrase('ayuda')">❓ Ayuda</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="resultSection" class="result-section">
+                <h3 style="margin-bottom: 15px;">Resultado:</h3>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sistema de Detección de Intenciones (Simplificado para Demo)
+        
+        const INTENT_PATTERNS = {
+            register: ['registr', 'registrarme', 'registro', 'crear cuenta', 'nueva cuenta', 'sign up', 'crear passkey', 'configurar passkey', 'alta', 'darme de alta'],
+            login: ['login', 'iniciar sesión', 'entrar', 'acceder', 'autenticar', 'biométrica', 'huella', 'passkey', 'ingresar', 'sign in'],
+            request_loan: ['préstamo', 'prestamo', 'solicitar préstamo', 'pedir préstamo', 'crédito', 'financiamiento', 'loan', 'necesito dinero', 'pedir dinero'],
+            check_balance: ['saldo', 'balance', 'cuánto tengo', 'mi saldo', 'consultar saldo', 'ver saldo', 'fondos', 'cuenta'],
+            view_dashboard: ['dashboard', 'panel', 'inicio', 'home', 'principal', 'mi cuenta'],
+            help: ['ayuda', 'help', 'ayúdame', 'no entiendo', 'qué puedo hacer', 'opciones', 'comandos', 'información', 'soporte'],
+            greeting: ['hola', 'buenas', 'buenos días', 'hey', 'hi', 'hello', 'saludos', 'qué tal'],
+            goodbye: ['adiós', 'adios', 'chau', 'hasta luego', 'nos vemos', 'bye'],
+        };
+        
+        function detectIntent(input) {
+            const normalizedInput = input.toLowerCase().trim();
+            const detectedIntents = [];
+            
+            for (const [intentType, patterns] of Object.entries(INTENT_PATTERNS)) {
+                const matches = [];
+                let matchCount = 0;
+                
+                for (const pattern of patterns) {
+                    if (normalizedInput.includes(pattern.toLowerCase())) {
+                        matches.push(pattern);
+                        matchCount++;
+                    }
+                }
+                
+                if (matchCount > 0) {
+                    detectedIntents.push({ type: intentType, matches: matchCount, patterns: matches });
+                }
+            }
+            
+            detectedIntents.sort((a, b) => b.matches - a.matches);
+            
+            if (detectedIntents.length === 0) {
+                return {
+                    type: 'unknown',
+                    confidence: 'low',
+                    entities: {},
+                    rawInput: input,
+                    matchedPatterns: []
+                };
+            }
+            
+            const topIntent = detectedIntents[0];
+            let confidence = 'low';
+            
+            if (topIntent.matches >= 3 || (topIntent.matches >= 2 && normalizedInput.split(' ').length <= 4)) {
+                confidence = 'high';
+            } else if (topIntent.matches >= 2 || normalizedInput.split(' ').length <= 3) {
+                confidence = 'medium';
+            }
+            
+            const entities = extractEntities(input, topIntent.type);
+            
+            return {
+                type: topIntent.type,
+                confidence: confidence,
+                entities: entities,
+                rawInput: input,
+                matchedPatterns: topIntent.patterns
+            };
+        }
+        
+        function extractEntities(input, intentType) {
+            const entities = {};
+            
+            if (intentType === 'request_loan' || intentType === 'check_balance') {
+                const amountMatch = input.match(/(\d+(?:\.\d+)?)\s*(xlm|usdc|lumens|dólares|dolares|pesos)?/i);
+                if (amountMatch) {
+                    entities.amount = parseFloat(amountMatch[1]);
+                    if (amountMatch[2]) {
+                        entities.currency = amountMatch[2].toLowerCase();
+                    }
+                }
+            }
+            
+            return entities;
+        }
+        
+        function getSuggestions(intentType) {
+            const suggestions = {
+                register: ['Continuar con registro', '¿Qué es un Passkey?', 'Ya tengo cuenta'],
+                login: ['Iniciar sesión ahora', '¿Olvidaste tu Passkey?', 'Crear cuenta nueva'],
+                request_loan: ['Ver opciones de préstamo', 'Consultar mi saldo', 'Ver historial'],
+                check_balance: ['Ver detalles', 'Solicitar préstamo', 'Ver historial'],
+                view_dashboard: ['Solicitar préstamo', 'Ver saldo', 'Configuración'],
+                help: ['Registrarme', 'Iniciar sesión', 'Solicitar préstamo', '¿Qué es un Passkey?'],
+                greeting: ['Registrarme', 'Iniciar sesión', '¿Cómo funciona?'],
+                goodbye: ['Volver', 'Cerrar sesión'],
+                unknown: ['Registrarme', 'Iniciar sesión', 'Solicitar préstamo', 'Ayuda']
+            };
+            
+            return suggestions[intentType] || suggestions.unknown;
+        }
+        
+        function getQuickReplies(intentType) {
+            const quickReplies = {
+                register: [
+                    { label: '✅ Registrarme ahora', icon: '✅' },
+                    { label: '❓ ¿Qué es un Passkey?', icon: '❓' },
+                    { label: '🔐 Ya tengo cuenta', icon: '🔐' }
+                ],
+                login: [
+                    { label: '🔐 Iniciar sesión', icon: '🔐' },
+                    { label: '📝 Crear cuenta', icon: '📝' },
+                    { label: '❓ Ayuda', icon: '❓' }
+                ],
+                request_loan: [
+                    { label: '✅ Solicitar préstamo', icon: '✅' },
+                    { label: '📊 Ver mi score', icon: '📊' },
+                    { label: '❓ Más información', icon: '❓' }
+                ],
+                check_balance: [
+                    { label: '📊 Ver dashboard', icon: '📊' },
+                    { label: '💰 Solicitar préstamo', icon: '💰' }
+                ],
+                help: [
+                    { label: '📝 Registrarme', icon: '📝' },
+                    { label: '🔐 Iniciar sesión', icon: '🔐' },
+                    { label: '💰 Préstamos', icon: '💰' }
+                ],
+                greeting: [
+                    { label: '📝 Soy nuevo', icon: '📝' },
+                    { label: '🔐 Ya tengo cuenta', icon: '🔐' },
+                    { label: '❓ Más información', icon: '❓' }
+                ]
+            };
+            
+            return quickReplies[intentType] || quickReplies.help;
+        }
+        
+        function getResponseText(intentType, entities) {
+            const responses = {
+                register: '¡Excelente! El registro es simple y seguro:\n\n📝 Paso 1: Elige tu nombre de usuario\n🔐 Paso 2: Crea tu Passkey biométrico\n\n¿Listo para comenzar?',
+                login: '¡Perfecto! Voy a iniciar tu autenticación biométrica con Passkey. Prepara tu huella digital o Face ID.',
+                request_loan: entities.amount ? 
+                    `¡Perfecto! Vi que mencionaste ${entities.amount} ${(entities.currency || 'XLM').toUpperCase()}.\n\nPara continuar, te llevaré a la pantalla de solicitud de préstamos donde podrás:\n\n💰 Elegir el monto\n📅 Seleccionar el plazo\n📊 Ver tu score crediticio` :
+                    '¡Perfecto! Puedo ayudarte a solicitar un préstamo.\n\nPara continuar, te llevaré a la pantalla de solicitud de préstamos.',
+                check_balance: '¡Claro! Te muestro tu información financiera:\n\n💳 Saldo disponible\n📊 Historial de transacciones\n💰 Préstamos activos',
+                view_dashboard: 'Te llevo a tu panel de control donde puedes ver toda tu información.',
+                help: '¡Estoy aquí para ayudarte! Puedo asistirte con:\n\n📝 Crear tu cuenta con Passkey\n🔐 Iniciar sesión con biometría\n💰 Solicitar préstamos\n❓ Información sobre la plataforma',
+                greeting: '¡Hola! 👋 Bienvenido a la plataforma de préstamos con autenticación biométrica.\n\n¿Eres nuevo o ya tienes cuenta?',
+                goodbye: '¡Hasta pronto! 👋 Si necesitas algo más, estaré aquí para ayudarte.',
+                unknown: 'No estoy seguro de entender tu mensaje. ¿Podrías ser más específico?\n\nPuedo ayudarte con:\n• Registrarte\n• Iniciar sesión\n• Solicitar préstamos\n• Consultar saldo'
+            };
+            
+            return responses[intentType] || responses.unknown;
+        }
+        
+        function testPhrase(phrase) {
+            document.getElementById('userInput').value = phrase;
+            detectIntentDemo();
+        }
+        
+        function detectIntentDemo() {
+            const input = document.getElementById('userInput').value;
+            
+            if (!input.trim()) {
+                alert('Por favor escribe un mensaje');
+                return;
+            }
+            
+            const intent = detectIntent(input);
+            const suggestions = getSuggestions(intent.type);
+            const quickReplies = getQuickReplies(intent.type);
+            const responseText = getResponseText(intent.type, intent.entities);
+            
+            const confidenceClass = `confidence-${intent.confidence}`;
+            
+            let html = `
+                <div class="result-card">
+                    <div class="result-header">
+                        <span class="intent-badge">${intent.type.toUpperCase()}</span>
+                        <span class="confidence-badge ${confidenceClass}">
+                            Confianza: ${intent.confidence.toUpperCase()}
+                        </span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-label">📝 Entrada del Usuario:</div>
+                        <div class="result-value">"${intent.rawInput}"</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-label">💬 Respuesta del Asistente:</div>
+                        <div class="result-value" style="white-space: pre-line;">${responseText}</div>
+                    </div>
+                    
+                    ${intent.matchedPatterns.length > 0 ? `
+                    <div class="result-item">
+                        <div class="result-label">🎯 Patrones Detectados:</div>
+                        <div class="result-value">${intent.matchedPatterns.join(', ')}</div>
+                    </div>
+                    ` : ''}
+                    
+                    ${Object.keys(intent.entities).length > 0 ? `
+                    <div class="result-item">
+                        <div class="result-label">🏷️ Entidades Extraídas:</div>
+                        <div class="result-value">${JSON.stringify(intent.entities, null, 2)}</div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="result-item">
+                        <div class="result-label">🔘 Botones de Respuesta Rápida:</div>
+                        <div class="quick-replies">
+                            ${quickReplies.map(r => `<button class="quick-reply-btn">${r.icon} ${r.label}</button>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-label">💡 Sugerencias:</div>
+                        <div class="suggestions">
+                            ${suggestions.map(s => `<span class="suggestion-chip">${s}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-label">📋 Datos Completos (JSON):</div>
+                        <div class="json-view">${JSON.stringify(intent, null, 2)}</div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('resultContent').innerHTML = html;
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>
