@@ -6,7 +6,7 @@ import { detectIntent } from "../lib/intent-detection";
 import { buildResponse, AssistantResponse } from "../lib/response-builder";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { useVoice } from "../hooks/useVoice";
-import { useElevenLabsTTS } from "../hooks/useElevenLabsTTS";
+import { useTTS } from "../hooks/useTTS";
 
 interface Message {
   role: "user" | "assistant";
@@ -38,13 +38,17 @@ const SmartAssistant: React.FC = () => {
     // NO destructuramos speak ni stopSpeaking de useVoice
   } = useVoice({ lang: "es-MX", continuous: false, interimResults: true });
 
-  // Voice functionality - Text to Speech (ElevenLabs) - ÚNICA fuente de audio
+  // Voice functionality - Text to Speech (Multi-provider: ElevenLabs → Speechify → Browser)
   const {
     isSpeaking,
     speak: speakElevenLabs,
     stopSpeaking: stopElevenLabs,
     error: ttsError,
-  } = useElevenLabsTTS();
+    currentProvider,
+  } = useTTS({ 
+    preferredProvider: 'elevenlabs', // Intentar ElevenLabs primero
+    fallbackEnabled: true // Si falla, usar Speechify, luego Browser
+  });
 
   useEffect(() => {
     // Only initialize once to prevent duplicate welcome messages
@@ -396,7 +400,7 @@ const SmartAssistant: React.FC = () => {
         {isSpeaking && (
           <div className="mb-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700 flex items-center gap-2">
             <span className="animate-pulse">🔊</span>
-            <span>Hablando...</span>
+            <span>Hablando{currentProvider ? ` (${currentProvider === 'elevenlabs' ? 'ElevenLabs' : currentProvider === 'speechify' ? 'Speechify' : 'Navegador'})` : ''}...</span>
           </div>
         )}
 
